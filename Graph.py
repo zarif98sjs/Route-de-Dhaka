@@ -68,6 +68,14 @@ class Graph:
     
     ############################# RL PART END ################################
     
+
+if __name__ == "__main__":
+    nodes = [1,2,3,4]
+    source = [1,1,2,3]
+    dest = [2,3,4,4]
+    weights = [3,5,7,3]
+    edges = [Edge(source[i],dest[i],weights[i],True) for i in range(len(source))]
+    g = Graph(nodes,edges)
     
     
     

@@ -14,6 +14,8 @@ class Q:
     def update_Q_R(self, state_current, state_next):
         reward = self.R[state_current][state_next]
         q = self.Q[state_current][state_next]
+        # TODO: state_next of destination node doesn't exist if unidirectional 
+        # HOW TO SOLVE
         q = q + self.alpha * (reward + min(self.Q[state_next].values()) - q)
         self.Q[state_current][state_next] = round(q,6)
 
@@ -29,8 +31,8 @@ class Q:
         state_current = start
         state_next = -1
      
-        # end is a list
-        while not state_next == end[0]: # TODO : check whether any problem
+        # end was a list in preimplemented version 
+        while state_next != end: # TODO : check whether any problem
             #input("Press to continue")
             valid_moves = list(self.Q[state_current].keys())
             
@@ -57,8 +59,9 @@ class Q:
 
     # TODO : nodes_number ???
     def Q_Routing(self, start, end):
-        for e in range(self.episodes):
-            print("In Episode : "+str(e))
+        for e in range(1,self.episodes+1):
+            if e%100 == 0:
+                print("In episode : "+str(e)+"/"+str(self.episodes))
             self.simulate_episode_QR(start, end)
         return self.Q
     
