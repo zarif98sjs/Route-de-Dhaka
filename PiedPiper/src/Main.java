@@ -377,6 +377,8 @@ public class Main{
                     if(vertex1.processed.revqueryId == queryID && vertex1.processed.revProcessed){
                         if(vertex1.distance.queryDist + vertex1.distance.revDistance < estimate){
                             estimate = vertex1.distance.queryDist + vertex1.distance.revDistance;
+                            //System.out.println("--> "+vertex1.vertexNum);
+
                         }
                     }
                 }
@@ -389,6 +391,7 @@ public class Main{
                     if(vertex2.processed.forwqueryId == queryID && vertex2.processed.forwProcessed){
                         if(vertex2.distance.revDistance + vertex2.distance.queryDist < estimate){
                             estimate = vertex2.distance.queryDist + vertex2.distance.revDistance;
+                            //System.out.println("--> "+vertex2.vertexNum);
                         }
                     }
                 }
@@ -530,8 +533,8 @@ public class Main{
 
         for (int i = 0; i < t; i++) {
             int u, v;
-            u = in.nextInt()-1;
-            v = in.nextInt()-1;
+            u = in.nextInt();
+            v = in.nextInt();
             System.out.println(bd.computeDist(graph,u,v,i,nodeOrdering));
         }
     }
