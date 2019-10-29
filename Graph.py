@@ -6,6 +6,12 @@ Created on Mon Oct 28 01:51:53 2019
 """
 import heapq
 
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 29 13:59:30 2019
+
+@author: USER
+"""
 
 class Edge:
     def __init__(self, source, dest, length, bidirectional=False):
@@ -17,7 +23,7 @@ class Edge:
 
 class Graph:
 
-    def __init__(self, nodes, edges, positions):
+    def __init__(self, nodes, edges):
         """
         constructor takes in nodes as list of integars
         and edges as lists of Edge class objects
@@ -39,9 +45,6 @@ class Graph:
             self.inDegree[i] = 0
             self.outDegree[i] = 0
             self.adj[i] = []
-
-        for i in range(len(nodes)):
-            self.positions[nodes[i]] = positions[i]
 
         for i in edges:
             self.add_edge(i.source, i.dest, i.length, i.bidirectional)
@@ -141,14 +144,24 @@ class Graph:
         :return: the path from the start to end node
         """
 
-        # first one is f,second one is g , third one is h, fourth one is node number and last one is position
-        start_node = (0, 0, 0, start, self.positions[start])
-        end_node = (0, 0, 0, end, self.positions[end])
-        end_pos = self.positions[end]
+        # first one is f,second one is g , third one is h, fourth one is node number
+        start_node = (1, 0, 1, start)
+        end_node = (1, 0, 1, end)
         parent = {}
         open_list = []  # this is the heap to maintain least f
         closed_list = {}
+
+        g_list = {}
+        f_list = {}
+        h_list = {}
+        for i in nodes:
+            f_list[i] = float('inf')
+            g_list[i] = float('inf')
+            h_list[i] = float('inf')
         parent[start] = -1
+        f_list[start] = 1
+        h_list[start] = 1
+        g_list[start] = 0
         heapq.heappush(open_list, start_node)
 
         while len(open_list) != 0:
@@ -171,11 +184,8 @@ class Graph:
                 children = []
                 for i in self.adj[current_node[3]]:  # Adjacent squares
 
-                    # Get node position
-                    node_position = self.positions[i[0]]
-
                     # Create new node
-                    new_node = (0, 0, 0, i[0], node_position)
+                    new_node = (1, 0, 1, i[0])
 
                     # Append
                     children.append(new_node)
@@ -183,33 +193,27 @@ class Graph:
                 # Loop through children
                 for child in children:
                     child_node_number = child[3]
-                    child_pos = child[4]
                     if child_node_number in closed_list.keys():
                         continue
 
                     # Create the f, g, and h values
-                    g = current_node[1] + self.adj_weights[(current_node_number, child_node_number)]
-                    h = ((child_pos[0] - end_pos[0]) ** 2) + (
-                            (child_pos[1] - end_pos[1]) ** 2)
-                    f = g + h
-
-                    # Child is already in the open list
-                    for open_node in open_list:
-                        if child_node_number == open_node[3] and g > open_node[1]:
-                            continue
-
-                    # Add the child to the open list
-                    # Set parent
-                    parent[child_node_number] = current_node_number
-                    insert_node = (f, g, h, child_node_number, child_pos)
-                    heapq.heappush(open_list, insert_node)
+                    g_value = current_node[1] + self.adj_weights[(current_node_number, child_node_number)]
+                    h_value = 1
+                    f_value = g_value + h_value
+                    #print(f_value, " ", g_value, " ", child_node_number)
+                    if f_list[child_node_number] > f_value:
+                        insert_node = (f_value, g_value, h_value, child_node_number)
+                        heapq.heappush(open_list, insert_node)
+                        parent[child_node_number] = current_node_number
+                        f_list[child_node_number] = f_value
+                        g_list[child_node_number] = g_value
+                        h_list[child_node_number] = h_value
 
         print("Path not found")
         return None
-
     ############################# RL PART ################################
 
-    # helper function 
+    # helper function
     def add_to_dict(self, key, value):
         if key in self.connections.keys():
             if value not in self.connections[key]:
@@ -248,14 +252,14 @@ class Graph:
 
 if __name__ == "__main__":
     nodes = [1, 2, 3, 4, 5]
-    positions = [(0, 0), (-5, 0), (-5, 2), (0, 9), (1, 1)]
+    # positions = [(0, 0), (-5, 0), (-5, 2), (0, 9), (1, 1)]
     source = [1, 1, 1, 4, 4, 3]
     dest = [2, 4, 5, 5, 3, 2]
-    weights = [5, 9, 1, 9.05, 8.6, 2]
+    weights = [5, 9, 1, 4, 6, 2]
     ##############################################################################################
 
     edges = [Edge(source[i], dest[i], weights[i], True) for i in range(len(source))]
-    g = Graph(nodes, edges, positions)
+    g = Graph(nodes, edges)
 
     print(g.get_edges())
     print(g.positions)
