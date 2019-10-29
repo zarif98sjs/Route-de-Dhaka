@@ -1,5 +1,6 @@
 //Program to implement Contraction Hierarchies Algorithm.
 
+import java.sql.SQLOutput;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,14 +16,14 @@ public class Main{
         int contractId;		//id for the vertex that is going to be contracted.
         int sourceId;           //it contains the id of vertex for which we will apply dijkstra while contracting.
 
-        long distance; 		//stores the value of distance while contracting.
+        Double distance; 		//stores the value of distance while contracting.
 
         //used in query time for bidirectional dijkstra algo
         int forwqueryId; 	//for forward search.
         int revqueryId; 	//for backward search.
 
-        long queryDist; 	//for forward distance.
-        long revDistance; 	//for backward distance.
+        Double queryDist; 	//for forward distance.
+        Double revDistance; 	//for backward distance.
 
         public Distance(){
             this.contractId = -1;
@@ -31,10 +32,10 @@ public class Main{
             this.forwqueryId=-1;
             this.revqueryId=-1;
 
-            this.distance = Integer.MAX_VALUE;
+            this.distance = Double.MAX_VALUE;
 
-            this.revDistance = Integer.MAX_VALUE;
-            this.queryDist = Integer.MAX_VALUE;
+            this.revDistance = Double.MAX_VALUE;
+            this.queryDist = Double.MAX_VALUE;
         }
     }
 
@@ -55,9 +56,10 @@ public class Main{
     static class Vertex{
         int vertexNum;			//id of the vertex.
         ArrayList<Integer> inEdges; 	//list of incoming edges to this vertex.
-        ArrayList<Long> inECost;	//list of incoming edges cost or distance.
+        ArrayList<Double> inECost;	//list of incoming edges cost or distance.
         ArrayList<Integer> outEdges; 	//list of outgoing edges from this vertex.
-        ArrayList<Long> outECost;	//list of out edges cost or distance.
+        ArrayList<Double> outECost;	//list of out edges cost or distance.
+
 
         int orderPos; 			//position of vertex in nodeOrderingQueue.
 
@@ -80,8 +82,8 @@ public class Main{
             this.vertexNum=vertexNum;
             this.inEdges = new ArrayList<Integer>();
             this.outEdges = new ArrayList<Integer>();
-            this.inECost = new ArrayList<Long>();
-            this.outECost = new ArrayList<Long>();
+            this.inECost = new ArrayList<Double>();
+            this.outECost = new ArrayList<Double>();
             this.distance = new Distance();
             this.processed = new Processed();
             this.delNeighbors = 0;
@@ -191,14 +193,14 @@ public class Main{
         //function to contract the node.
         private void contractNode(Vertex [] graph, Vertex vertex, int contractId){
             ArrayList<Integer> inEdges = vertex.inEdges;
-            ArrayList<Long> inECost = vertex.inECost;
+            ArrayList<Double> inECost = vertex.inECost;
             ArrayList<Integer> outEdges = vertex.outEdges;
-            ArrayList<Long> outECost = vertex.outECost;
+            ArrayList<Double> outECost = vertex.outECost;
 
             vertex.contracted=true;
 
-            long inMax = 0;						//stores the max distance out of uncontracted inVertices of the given vertex.
-            long outMax =0;						//stores the max distance out of uncontracted outVertices of the given vertex.
+            Double inMax = 0.0;						//stores the max distance out of uncontracted inVertices of the given vertex.
+            Double outMax =0.0;						//stores the max distance out of uncontracted outVertices of the given vertex.
 
             calNeighbors(graph,vertex.inEdges,vertex.outEdges);	//update the given vertex's neighbors about that the given vertex is contracted.
 
@@ -220,21 +222,21 @@ public class Main{
                 }
             }
 
-            long max = inMax+outMax; 				//total max distance.
+            Double max = inMax+outMax; 				//total max distance.
 
             for(int i=0;i<inEdges.size();i++){
                 int inVertex = inEdges.get(i);
                 if(graph[inVertex].contracted){
                     continue;
                 }
-                long incost = inECost.get(i);
+                Double incost = inECost.get(i);
 
                 dijkstra(graph,inVertex,max,contractId,i); 	//finds the shortest distances from the inVertex to all the outVertices.
 
                 //this code adds shortcuts.
                 for(int j=0;j<outEdges.size();j++){
                     int outVertex = outEdges.get(j);
-                    long outcost = outECost.get(j);
+                    Double outcost = outECost.get(j);
                     if(graph[outVertex].contracted){
                         continue;
                     }
@@ -250,10 +252,10 @@ public class Main{
 
 
         //dijkstra function implemented.
-        private void dijkstra(Vertex [] graph, int source, long maxcost, int contractId,int sourceId){
+        private void dijkstra(Vertex [] graph, int source, Double maxcost, int contractId,int sourceId){
             queue = new PriorityQueue<Vertex>(graph.length,PQcomp);
 
-            graph[source].distance.distance = 0;
+            graph[source].distance.distance = 0.0;
             graph[source].distance.contractId=contractId;
             graph[source].distance.sourceId = sourceId;
 
@@ -273,11 +275,11 @@ public class Main{
         //function to relax outgoing edges.
         private void relaxEdges(Vertex [] graph,int vertex,int contractId, PriorityQueue queue,int sourceId){
             ArrayList<Integer> vertexList = graph[vertex].outEdges;
-            ArrayList<Long> costList = graph[vertex].outECost;
+            ArrayList<Double> costList = graph[vertex].outECost;
 
             for(int i=0;i<vertexList.size();i++){
                 int temp = vertexList.get(i);
-                long cost = costList.get(i);
+                Double cost = costList.get(i);
                 if(graph[temp].contracted){
                     continue;
                 }
@@ -349,12 +351,12 @@ public class Main{
         PriorityQueue<Vertex> revQ;
 
         //main function that will compute distances.
-        public long computeDist(Vertex [] graph, int source, int target, int queryID , int [] nodeOrdering){
-            graph[source].distance.queryDist = 0;
+        public Double computeDist(Vertex [] graph, int source, int target, int queryID , int [] nodeOrdering){
+            graph[source].distance.queryDist = 0.0;
             graph[source].distance.forwqueryId = queryID;
             graph[source].processed.forwqueryId = queryID;
 
-            graph[target].distance.revDistance = 0;
+            graph[target].distance.revDistance = 0.0;
             graph[target].distance.revqueryId = queryID;
             graph[target].processed.revqueryId = queryID;
 
@@ -364,7 +366,7 @@ public class Main{
             forwQ.add(graph[source]);
             revQ.add(graph[target]);
 
-            long estimate = Long.MAX_VALUE;
+            Double estimate = Double.MAX_VALUE;
 
             while(forwQ.size()!=0 || revQ.size()!=0){
                 if(forwQ.size()!=0){
@@ -392,8 +394,8 @@ public class Main{
                 }
             }
 
-            if(estimate==Long.MAX_VALUE){
-                return -1;
+            if(estimate==Double.MAX_VALUE){
+                return -1.0;
             }
             return estimate;
         }
@@ -404,13 +406,13 @@ public class Main{
         private void relaxEdges(Vertex [] graph, int vertex,String str,int [] nodeOrdering, int queryId){
             if(str == "f"){
                 ArrayList<Integer> vertexList = graph[vertex].outEdges;
-                ArrayList<Long> costList = graph[vertex].outECost;
+                ArrayList<Double> costList = graph[vertex].outECost;
                 graph[vertex].processed.forwProcessed=true;
                 graph[vertex].processed.forwqueryId = queryId;
 
                 for(int i=0;i<vertexList.size();i++){
                     int temp = vertexList.get(i);
-                    long cost = costList.get(i);
+                    Double cost = costList.get(i);
                     if(graph[vertex].orderPos < graph[temp].orderPos){
                         if(graph[vertex].distance.forwqueryId != graph[temp].distance.forwqueryId || graph[temp].distance.queryDist > graph[vertex].distance.queryDist + cost){
                             graph[temp].distance.forwqueryId = graph[vertex].distance.forwqueryId;
@@ -424,13 +426,13 @@ public class Main{
             }
             else{
                 ArrayList<Integer> vertexList = graph[vertex].inEdges;
-                ArrayList<Long> costList = graph[vertex].inECost;
+                ArrayList<Double> costList = graph[vertex].inECost;
                 graph[vertex].processed.revProcessed = true;
                 graph[vertex].processed.revqueryId = queryId;
 
                 for(int i=0;i<vertexList.size();i++){
                     int temp = vertexList.get(i);
-                    long cost = costList.get(i);
+                    Double cost = costList.get(i);
 
                     if(graph[vertex].orderPos < graph[temp].orderPos){
                         if(graph[vertex].distance.revqueryId != graph[temp].distance.revqueryId || graph[temp].distance.revDistance > graph[vertex].distance.revDistance + cost){
@@ -461,23 +463,55 @@ public class Main{
             graph[i] = new Vertex(i);
         }
 
+        HashMap<Long,Integer>HMap = new HashMap<>();
+
+        long origin = 53075602 - 1;
+        long target = 53035698 - 1;
+
         //get edges
+        int cnt = 0;
         for (int i = 0; i < m; i++) {
-            int x, y;
-            Long c;
-            x = in.nextInt()-1;
-            y = in.nextInt()-1;
-            c = in.nextLong();
+            Long x, y;
+            int type;
+            Double c;
+            x = in.nextLong()-1;
+            y = in.nextLong()-1;
+            c = in.nextDouble();
+            type = in.nextInt();
 
-            graph[x].outEdges.add(y);
-            graph[x].outECost.add(c);
-            graph[y].outEdges.add(x);
-            graph[y].outECost.add(c);
+            if(!HMap.containsKey(x))
+            {
+                HMap.put(x,cnt);
+                cnt++;
+            }
+            if(!HMap.containsKey(y))
+            {
+                HMap.put(y,cnt);
+                cnt++;
+            }
 
-            graph[x].inEdges.add(y);
-            graph[x].inECost.add(c);
-            graph[y].inEdges.add(x);
-            graph[y].inECost.add(c);
+            int xx = HMap.get(x);
+            int yy = HMap.get(y);
+
+            graph[xx].outEdges.add(yy);
+            graph[xx].outECost.add(c);
+            graph[yy].inEdges.add(xx);
+            graph[yy].inECost.add(c);
+
+            if(type==1)
+            {
+                graph[yy].outEdges.add(xx);
+                graph[yy].outECost.add(c);
+                graph[xx].inEdges.add(yy);
+                graph[xx].inECost.add(c);
+            }
+        }
+
+        for(Long name:HMap.keySet())
+        {
+            String key = name.toString();
+            String value = HMap.get(name).toString();
+            System.out.println(key + " " + value);
         }
 
         //preprocessing stage.
@@ -485,6 +519,9 @@ public class Main{
         int [] nodeOrdering = process.processing(graph);
 
         System.out.println("Ready");
+
+        System.out.println(HMap.get(origin));
+        System.out.println(HMap.get(target));
 
         //acutal distance computation stage.
         BidirectionalDijkstra bd = new BidirectionalDijkstra();
