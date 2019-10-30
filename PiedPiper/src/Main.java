@@ -33,7 +33,6 @@ public class Main{
             this.revqueryId=-1;
 
             this.distance = Double.MAX_VALUE;
-
             this.revDistance = Double.MAX_VALUE;
             this.queryDist = Double.MAX_VALUE;
         }
@@ -341,14 +340,13 @@ public class Main{
         }
     }
 
-
-
     //class for bidirectional dijstra search.
     static class BidirectionalDijkstra{
         Comparator<Vertex> forwComp = new forwComparator();
         Comparator<Vertex> revComp = new revComparator();
         PriorityQueue<Vertex> forwQ;
         PriorityQueue<Vertex> revQ;
+        HashMap<Integer,Integer> parent= new HashMap<>();
 
         //main function that will compute distances.
         public Double computeDist(Vertex [] graph, int source, int target, int queryID , int [] nodeOrdering){
@@ -372,13 +370,16 @@ public class Main{
                 if(forwQ.size()!=0){
                     Vertex vertex1 = (Vertex)forwQ.poll();
                     if(vertex1.distance.queryDist<=estimate){
+                        //System.out.println("case 1 --> "+vertex1.vertexNum);
                         relaxEdges(graph,vertex1.vertexNum,"f",nodeOrdering,queryID);
                     }
                     if(vertex1.processed.revqueryId == queryID && vertex1.processed.revProcessed){
                         if(vertex1.distance.queryDist + vertex1.distance.revDistance < estimate){
                             estimate = vertex1.distance.queryDist + vertex1.distance.revDistance;
-                            //System.out.println("--> "+vertex1.vertexNum);
-
+                            System.out.println(vertex1.distance.queryDist);
+                            System.out.println(vertex1.distance.revDistance);
+                            //System.out.println("case 2 --> "+vertex1.vertexNum);
+                            //System.out.println(estimate);
                         }
                     }
                 }
@@ -387,11 +388,13 @@ public class Main{
                     Vertex vertex2 = (Vertex)revQ.poll();
                     if(vertex2.distance.revDistance <= estimate){
                         relaxEdges(graph,vertex2.vertexNum,"r",nodeOrdering,queryID);
+                        //System.out.println("case 3 --> "+vertex2.vertexNum);
                     }
                     if(vertex2.processed.forwqueryId == queryID && vertex2.processed.forwProcessed){
                         if(vertex2.distance.revDistance + vertex2.distance.queryDist < estimate){
                             estimate = vertex2.distance.queryDist + vertex2.distance.revDistance;
-                            //System.out.println("--> "+vertex2.vertexNum);
+                            //System.out.println("case 4 --> "+vertex2.vertexNum);
+                            //System.out.println(estimate);
                         }
                     }
                 }
@@ -400,6 +403,22 @@ public class Main{
             if(estimate==Double.MAX_VALUE){
                 return -1.0;
             }
+
+            //won't give the path including all nodes because of the contraction
+            ArrayList<Integer>path = new ArrayList<>();
+            int now = target;
+            while(now!=source)
+            {
+                //System.out.println("#"+now);
+                path.add(now);
+                now = parent.get(now);
+            }
+            path.add(source);
+            Collections.reverse(path);
+            for(int x:path)
+                System.out.print(x + " -> ");
+            System.out.println();
+            //System.out.println("#"+source);
             return estimate;
         }
 
@@ -420,7 +439,9 @@ public class Main{
                         if(graph[vertex].distance.forwqueryId != graph[temp].distance.forwqueryId || graph[temp].distance.queryDist > graph[vertex].distance.queryDist + cost){
                             graph[temp].distance.forwqueryId = graph[vertex].distance.forwqueryId;
                             graph[temp].distance.queryDist = graph[vertex].distance.queryDist + cost;
-
+                            parent.put(temp,vertex);
+                            System.out.println("Here -----> " + temp+"->"+vertex);
+                            System.out.println("Dist : "+graph[temp].distance.queryDist);
                             forwQ.remove(graph[temp]);
                             forwQ.add(graph[temp]);
                         }
@@ -441,7 +462,9 @@ public class Main{
                         if(graph[vertex].distance.revqueryId != graph[temp].distance.revqueryId || graph[temp].distance.revDistance > graph[vertex].distance.revDistance + cost){
                             graph[temp].distance.revqueryId = graph[vertex].distance.revqueryId;
                             graph[temp].distance.revDistance = graph[vertex].distance.revDistance + cost;
-
+                            parent.put(vertex,temp);
+                            System.out.println("BackHere -----> " + vertex + "->"+temp);
+                            System.out.println("Dist : "+graph[temp].distance.revDistance);
                             revQ.remove(graph[temp]);
                             revQ.add(graph[temp]);
                         }
@@ -475,12 +498,12 @@ public class Main{
         int cnt = 0;
         for (int i = 0; i < m; i++) {
             Long x, y;
-            int type;
+            int type=1;
             Double c;
             x = in.nextLong()-1;
             y = in.nextLong()-1;
             c = in.nextDouble();
-            type = in.nextInt();
+            //type = in.nextInt();
 
             if(!HMap.containsKey(x))
             {
@@ -514,7 +537,9 @@ public class Main{
         {
             String key = name.toString();
             String value = HMap.get(name).toString();
-            System.out.println(key + " " + value);
+            name = name + 1;
+            String key2 = name.toString();
+            System.out.println(key2 + " --> " + value);
         }
 
         //preprocessing stage.
