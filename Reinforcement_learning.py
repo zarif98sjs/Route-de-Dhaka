@@ -31,8 +31,11 @@ class RL:
         path = [start]
         cost = []
         node = start
-        while node != end:
+        while node != end:  # TODO : find a way to exit code when end doesn't exist
             temp = self.get_node_with_minQ(self.Q[node])
+            if temp in path:
+                print("No path detected")
+                break
             path.append(temp)
             cost.append(float(self.R[node][temp]))
             node = temp

@@ -11,6 +11,7 @@ class Q:
 
 
     # changes the Q values for one single move
+    # this uses TD(0) method   
     def update_Q_R(self, state_current, state_next):
         reward = self.R[state_current][state_next]
         q = self.Q[state_current][state_next]
@@ -27,16 +28,20 @@ class Q:
 
 
 
+    # TODO : test decaying epsilon
     def simulate_episode_QR(self, start, end):
         state_current = start
         state_next = -1
-     
+        
+        iteration = 0 #for decay_e
+        
         # end was a list in preimplemented version 
-        while state_next != end: # TODO : check whether any problem
+        while state_next != end and iteration <10000: # TODO : check whether any problem
             #input("Press to continue")
             valid_moves = list(self.Q[state_current].keys())
             
-
+            iteration += 1;
+            
             if len(valid_moves) == 0:
                 break # TODO : check. if no valid moves left just start over
             elif len(valid_moves) == 1:
@@ -44,7 +49,7 @@ class Q:
             else:
                 best_action = random.choice(self.key_of_min_value(self.Q[state_current]))
                 # print("best_action : "+str(best_action))
-                if random.random() < self.epsilon:
+                if random.random() < self.epsilon: # use (1/(iteration+1)) for decay_e
                     valid_moves.pop(valid_moves.index(best_action))
                     state_next = random.choice(valid_moves)
                 else:
@@ -58,6 +63,7 @@ class Q:
 
 
     # TODO : nodes_number ???
+    # This is Q_learning 
     def Q_Routing(self, start, end):
         for e in range(1,self.episodes+1):
             if e%100 == 0:
