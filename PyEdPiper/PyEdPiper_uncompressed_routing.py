@@ -6,6 +6,8 @@ Created on Wed Oct 30 14:41:33 2019
 """
 import heapq
 import numpy as np
+import networkx as nx
+import osmnx as ox
 
 inf = 1e18
 
@@ -147,7 +149,7 @@ class PreProcess:
                     continue
             
                 if graph[outVertex].distance.contractId!=contractId or graph[outVertex].distance.sourceId!=i or graph[outVertex].distance.distance>(incost+outcost):
-                    print("In : ",revHMap[inVertex] , " , Out : ",revHMap[outVertex] ," , Current : ",revHMap[vertex.vertexNum])
+                    #print("In : ",revHMap[inVertex] , " , Out : ",revHMap[outVertex] ," , Current : ",revHMap[vertex.vertexNum])
                     inn = revHMap[inVertex]
                     outt = revHMap[outVertex]
                     midd = revHMap[vertex.vertexNum]
@@ -330,11 +332,11 @@ def take_input():
             break
         temp = []
         for x in line.split(' '):
-            num = int(x)
+            num = float(x)
             temp.append(num)
         if not flag:
-            n = temp[0]
-            m = temp[1]
+            n = int(temp[0])
+            m = int(temp[1])
             flag = True
         else:
             edge_list.append( (temp[0], temp[1], temp[2],temp[3]) )
@@ -345,6 +347,15 @@ def take_input():
 
                     
 if __name__ == '__main__':
+    
+    
+    G = ox.graph_from_place('Piedmont, California, USA', network_type='drive')
+    nodes_proj, edges = ox.graph_to_gdfs(G, edges=True)
+    #edges = [g.Edge(source[i],dest[i],weights[i]) for i in range(len(source))]
+    
+    orig_node = ox.get_nearest_node(G, (37.828903, -122.245846))
+    dest_node = ox.get_nearest_node(G, (37.812303, -122.215006))
+    route = nx.shortest_path(G, orig_node, dest_node, weight='length')
     
     n, m, lis = take_input()
     print(n)
@@ -389,9 +400,10 @@ if __name__ == '__main__':
             graph[x].inEdges.append(y)
             graph[x].inECost.append(cost)
           
-    print(HMap)
-    print(revHMap)
-    
+    #print(HMap)
+    #print(revHMap)
+    # origin , dest
+    #53075602 53035698
         
     process = PreProcess()
     nodeOrdering = process.processing(graph)
@@ -403,5 +415,5 @@ if __name__ == '__main__':
     for i in range(t):
         u = np.int64(input())
         v = np.int64(input())
-        print(bd.computeDist(graph,u,v,i,nodeOrdering))
+        print(bd.computeDist(graph,HMap[u],HMap[v],i,nodeOrdering))
      
