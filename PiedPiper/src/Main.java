@@ -199,7 +199,7 @@ public class Main{
             vertex.contracted=true;
 
             Double inMax = 0.0;						//stores the max distance out of uncontracted inVertices of the given vertex.
-            Double outMax = 0.0;						//stores the max distance out of uncontracted outVertices of the given vertex.
+            Double outMax =0.0;						//stores the max distance out of uncontracted outVertices of the given vertex.
 
             calNeighbors(graph,vertex.inEdges,vertex.outEdges);	//update the given vertex's neighbors about that the given vertex is contracted.
 
@@ -240,9 +240,6 @@ public class Main{
                         continue;
                     }
                     if(graph[outVertex].distance.contractId!=contractId || graph[outVertex].distance.sourceId!=i || graph[outVertex].distance.distance>incost+outcost){
-
-                        System.out.println("In : "+inVertex + " , Out : "+outVertex +" , Current : "+vertex.vertexNum);
-
                         graph[inVertex].outEdges.add(outVertex);
                         graph[inVertex].outECost.add(incost+outcost);
                         graph[outVertex].inEdges.add(inVertex);
@@ -437,7 +434,6 @@ public class Main{
 
                 for(int i=0;i<vertexList.size();i++){
                     int temp = vertexList.get(i);
-                    System.out.println("Vertex : "+vertex +" Temp : "+temp);
                     Double cost = costList.get(i);
                     if(graph[vertex].orderPos < graph[temp].orderPos){
                         if(graph[vertex].distance.forwqueryId != graph[temp].distance.forwqueryId || graph[temp].distance.queryDist > graph[vertex].distance.queryDist + cost){
