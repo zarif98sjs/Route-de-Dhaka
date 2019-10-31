@@ -174,23 +174,23 @@ class PreProcess:
                
                 
     def dijkstra(self,graph,source,maxcost,contractId,sourceId):
-        queue = []
         
+        self.queue.clear()
         graph[source].distance.distance = 0
         graph[source].distance.contractId = contractId
         graph[source].distance.sourceId = sourceId
         
-        heapq.heappush(queue,(graph[source].distance.distance,graph[source]))
+        heapq.heappush(self.queue,(graph[source].distance.distance,graph[source]))
         #print(queue)
         
         i = 0
-        while len(queue)!=0:
-            vertex = heapq.heappop(queue)[1]
+        while len(self.queue)!=0:
+            vertex = heapq.heappop(self.queue)[1]
             if i>3 or vertex.distance.distance>maxcost :
                 return
-            self.relaxEdges(graph,vertex.vertexNum,contractId,queue,sourceId)
+            self.relaxEdges(graph,vertex.vertexNum,contractId,sourceId)
             
-    def relaxEdges(self,graph,vertex,contractId,queue,sourceId):
+    def relaxEdges(self,graph,vertex,contractId,sourceId):
         vertexList = graph[vertex].outEdges
         costList = graph[vertex].outECost
         
@@ -210,10 +210,10 @@ class PreProcess:
                 #print(queue)
                 #print("-->",graph[temp].vertexNum)
                 el = (graph[temp].distance.distance,graph[temp])
-                if(el in queue):
-                    queue.remove(el)
-                    heapq.heapify(queue)
-                heapq.heappush(queue,(graph[temp].distance.distance,graph[temp]))
+                if(el in self.queue):
+                    self.queue.remove(el)
+                    heapq.heapify(self.queue)
+                heapq.heappush(self.queue,(graph[temp].distance.distance,graph[temp]))
                 
     def checkId(self,graph,source,target):
         if graph[source].distance.contractId != graph[target].distance.contractId or graph[source].distance.sourceId != graph[target].distance.sourceId:
