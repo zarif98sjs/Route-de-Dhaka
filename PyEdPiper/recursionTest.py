@@ -32,6 +32,12 @@ if __name__ == '__main__':
     #go(1,10)
     #print(d)
     #go2(1,10)
-    d[(1,5)] = 2
-    d[(1,6)] = 2
-    d[(1,5)] = 100
+    li=[]
+    li.append((1,5))
+    li.append((3,6))
+    li.append((2,5))
+    
+    for el in li:
+        print(el[0])
+    
+    li.remove((2,5))

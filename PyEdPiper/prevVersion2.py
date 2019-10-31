@@ -70,6 +70,7 @@ class PreProcess:
         
     def computeImportance1(self,graph):
         #key = lambda x:x.importance
+        print("Computing Graph Importance")
         for i in range(len(graph)):
             graph[i].edgeDiff = (len(graph[i].inEdges)*len(graph[i].outEdges)) - len(graph[i].inEdges) - len(graph[i].outEdges)         
             graph[i].shortcutCover = len(graph[i].inEdges) + len(graph[i].outEdges)
@@ -98,7 +99,7 @@ class PreProcess:
             vertex.orderPos = extractNum
             extractNum += 1
             self.contractNode(graph,vertex,extractNum-1)
-            
+        print("PreProcessing Done")
         return nodeOrdering
     
     def calNeighbours(self,graph,inEdges,outEdges):
@@ -120,7 +121,7 @@ class PreProcess:
         inMax = 0
         outMax = 0
         
-        self.calNeighbours(graph,vertex.inEdges,vertex.outEdges)
+        self.calNeighbours(graph,inEdges,outEdges)
         
         for i in range(len(inECost)):
             if graph[inEdges[i]].contracted==True:
@@ -166,6 +167,8 @@ class PreProcess:
                 
     def dijkstra(self,graph,source,maxcost,contractId,sourceId):
         
+        self.queue.clear()
+        
         graph[source].distance.distance = 0
         graph[source].distance.contractId = contractId
         graph[source].distance.sourceId = sourceId
@@ -177,9 +180,9 @@ class PreProcess:
             vertex = heapq.heappop(self.queue)[1]
             if (vertex.distance.distance>maxcost):
                 return
-            self.relaxEdges(graph,vertex.vertexNum,contractId,self.queue,sourceId)
+            self.relaxEdges(graph,vertex.vertexNum,contractId,sourceId)
             
-    def relaxEdges(self,graph,vertex,contractId,queue,sourceId):
+    def relaxEdges(self,graph,vertex,contractId,sourceId):
         vertexList = graph[vertex].outEdges
         costList = graph[vertex].outECost
         
@@ -190,7 +193,19 @@ class PreProcess:
             if graph[temp].contracted==True:
                 continue
             
-            if self.checkId(graph,vertex,temp)==True or (graph[temp].distance.distance > (graph[vertex].distance.distance + cost)):
+            if (self.checkId(graph,vertex,temp)==True) or (graph[temp].distance.distance > (graph[vertex].distance.distance + cost)):
+                el = (graph[temp].distance.distance,graph[temp])
+                for xx in self.queue:
+                    if xx[1]==graph[temp]:
+                        print("aaaaaaaaaaaaaaaaaa")
+                        self.queue.remove(xx)
+                        heapq.heapify(self.queue)
+                '''        
+                while(el in self.queue)==True:
+                    print("aaaaaaaaaaaaaaaaaa")
+                    self.queue.remove(el)
+                    heapq.heapify(self.queue)
+                '''    
                 graph[temp].distance.distance = graph[vertex].distance.distance + cost
                 graph[temp].distance.contractId = contractId
                 graph[temp].distance.sourceId = sourceId
@@ -198,11 +213,7 @@ class PreProcess:
                 ##need to change the delete into log(n)
                 #print(queue)
                 #print("-->",graph[temp].vertexNum)
-                el = (graph[temp].distance.distance,graph[temp])
-                if(el in queue)==True:
-                    queue.remove(el)
-                    heapq.heapify(queue)
-                heapq.heappush(queue,(graph[temp].distance.distance,graph[temp]))
+                heapq.heappush(self.queue,(graph[temp].distance.distance,graph[temp]))
                 
     def checkId(self,graph,source,target):
         if (graph[source].distance.contractId != graph[target].distance.contractId) or (graph[source].distance.sourceId != graph[target].distance.sourceId):
@@ -295,16 +306,18 @@ class BidirectionalDijkstra:
                
                if graph[vertex].orderPos < graph[temp].orderPos:
                    if graph[vertex].distance.forwqueryId != graph[temp].distance.forwqueryId or (graph[temp].distance.queryDist > (graph[vertex].distance.queryDist + cost)):
+                      el = (graph[temp].distance.queryDist,graph[temp])
+                      if (el in self.forwQ)==True:
+                          self.forwQ.remove(el)
+                          heapq.heapify(self.forwQ)
+                          
                       graph[temp].distance.forwqueryId = graph[vertex].distance.forwqueryId
                       graph[temp].distance.queryDist = graph[vertex].distance.queryDist + cost
                       self.parent[temp] = vertex
                       print(temp,"  -> ",vertex)
                       #print("Here")
                       #print("Dist  :  ",graph[temp].distance.queryDist)
-                      el = (graph[temp].distance.queryDist,graph[temp])
-                      if (el in self.forwQ)==True:
-                          self.forwQ.remove(el)
-                          heapq.heapify(self.forwQ)
+                     
                       heapq.heappush(self.forwQ,(graph[temp].distance.queryDist,graph[temp]))
                
         else:
@@ -321,16 +334,18 @@ class BidirectionalDijkstra:
                
                if graph[vertex].orderPos < graph[temp].orderPos:
                    if graph[vertex].distance.revqueryId != graph[temp].distance.revqueryId or (graph[temp].distance.revDistance > (graph[vertex].distance.revDistance + cost)): 
+                       el = (graph[temp].distance.revDistance,graph[temp])
+                       if (el in self.revQ)==True:
+                           self.revQ.remove(el)
+                           heapq.heapify(self.revQ)
+                           
                        graph[temp].distance.revqueryId = graph[vertex].distance.revqueryId
                        graph[temp].distance.revDistance = graph[vertex].distance.revDistance + cost
                        self.parent[vertex] = temp
                        print(vertex,"  -->  ",temp)
                        #print("BackHere")
                        #print("Dist  :  ",graph[temp].distance.revDistance)
-                       el = (graph[temp].distance.revDistance,graph[temp])
-                       if (el in self.revQ)==True:
-                           self.revQ.remove(el)
-                           heapq.heapify(self.revQ)
+        
                        heapq.heappush(self.revQ,(graph[temp].distance.revDistance,graph[temp]))
 
 
