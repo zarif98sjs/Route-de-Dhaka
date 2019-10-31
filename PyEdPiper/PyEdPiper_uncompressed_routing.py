@@ -57,7 +57,7 @@ class Vertex:
         self.orderPos = 0
         
     def __lt__(self,other):
-        return self.vertexNum<other.vertexNum
+        return self.orderPos>other.orderPos
         
 class PreProcess:
     def __init__(self):
@@ -150,9 +150,9 @@ class PreProcess:
             
                 if graph[outVertex].distance.contractId!=contractId or graph[outVertex].distance.sourceId!=i or graph[outVertex].distance.distance>(incost+outcost):
                     #print("In : ",revHMap[inVertex] , " , Out : ",revHMap[outVertex] ," , Current : ",revHMap[vertex.vertexNum])
-                    inn = revHMap[inVertex]
-                    outt = revHMap[outVertex]
-                    midd = revHMap[vertex.vertexNum]
+                    inn = inVertex
+                    outt = outVertex
+                    midd = vertex.vertexNum
                     conEdge[(inn,outt)] = midd
                     graph[inVertex].outEdges.append(outVertex)
                     graph[inVertex].outECost.append(incost+outcost)
@@ -256,25 +256,26 @@ class BidirectionalDijkstra:
         
         print("Est ----> ",estimate)
         print(self.parent)
-        
+        self.find_route(source,target)
+        '''
         path = []
         now = target
         while now!=source:
             path.append(revHMap[now])
-            '''
+            ''''''
             cur = revHMap[now]
             temp = revHMap[self.parent[now]]
             el = (cur,temp)
             while el in conEdge:
                 path.append(conEdge[el])
                 el = (cur,conEdge[el])
-            '''
+            ''''''
             now = self.parent[now]
         path.append(revHMap[source])
         path.reverse()
         
         print("Path ",path)
-        
+        '''
         return estimate
     
     def relaxEdges(self,graph,vertex,stri,nodeOrdering,queryId):
@@ -311,21 +312,48 @@ class BidirectionalDijkstra:
            
             for i in range(len(vertexList)):
                temp = vertexList[i]
+               #print("@Vertex : ",vertex ," Temp : ",temp)
                cost = costList[i]
                
                if graph[vertex].orderPos < graph[temp].orderPos:
-                   if graph[vertex].distance.revqueryId != graph[temp].distance.revqueryId or (graph[temp].distance.revDistance > (graph[vertex].distance.revDistance + cost)):
-                      graph[temp].distance.revqueryId = graph[vertex].distance.revqueryId
-                      graph[temp].distance.revDistance = graph[vertex].distance.revDistance + cost
-                      self.parent[vertex] = temp
-                      print(vertex,"  -->  ",temp)
-                      #print("BackHere")
-                      #print("Dist  :  ",graph[temp].distance.revDistance)
-                      el = (graph[temp].distance.revDistance,graph[temp])
-                      if (el in self.revQ):
-                          self.revQ.remove(el)
-                          heapq.heapify(self.revQ)
-                      heapq.heappush(self.revQ,(graph[temp].distance.revDistance,graph[temp]))
+                   if graph[vertex].distance.revqueryId != graph[temp].distance.revqueryId or (graph[temp].distance.revDistance > (graph[vertex].distance.revDistance + cost)): 
+                       graph[temp].distance.revqueryId = graph[vertex].distance.revqueryId
+                       graph[temp].distance.revDistance = graph[vertex].distance.revDistance + cost
+                       self.parent[vertex] = temp
+                       print(vertex,"  -->  ",temp)
+                       #print("BackHere")
+                       #print("Dist  :  ",graph[temp].distance.revDistance)
+                       el = (graph[temp].distance.revDistance,graph[temp])
+                       if (el in self.revQ):
+                           self.revQ.remove(el)
+                           heapq.heapify(self.revQ)
+                       heapq.heappush(self.revQ,(graph[temp].distance.revDistance,graph[temp]))
+
+
+    def uncompress(self,start,end,path):
+        print("aaaaaaaaa")
+        el = (start,end)
+        if (el in conEdge)==False:
+            return
+        print("yesssss")
+        mid = conEdge[el]
+        self.uncompress(start,mid,path)
+        print("MId :",mid)
+        path.append(revHMap[mid])
+        self.uncompress(mid,end,path)
+
+    def find_route(self,source,target):
+        print(conEdge)
+        path = []
+        now = target
+        while now!=source:
+            path.append(revHMap[now])
+            self.uncompress(now,self.parent[now],path)
+            now = self.parent[now]
+        path.append(revHMap[source])
+        path.reverse()
+        print(path)
+        
 
 eps = 1e-6
 
@@ -418,7 +446,11 @@ if __name__ == '__main__':
     nodeOrdering = process.processing(graph)
         
     bd = BidirectionalDijkstra()
-        
+            
+    u = 53075602
+    v = 53035698
+    print(bd.computeDist(graph,HMap[u],HMap[v],i,nodeOrdering))
+    
     t = np.int64(input())
         
     for i in range(t):
