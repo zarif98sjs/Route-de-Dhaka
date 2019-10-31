@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Oct 30 14:41:33 2019
-
 @author: Zarif
 """
 import heapq
@@ -16,6 +15,9 @@ revHMap = {}
 conEdge = {}
 
 Edge = {}
+
+f = open("par.txt","w")
+f2 = open("ver_temp.txt","w")
 
 class Distance:
     def __init__(self):
@@ -59,7 +61,7 @@ class Vertex:
         self.orderPos = 0
         
     def __lt__(self,other):
-        return self.orderPos>other.orderPos
+        return self.orderPos<other.orderPos
         
 class PreProcess:
     def __init__(self):
@@ -80,6 +82,7 @@ class PreProcess:
         vertex.importance = vertex.edgeDiff*14 + vertex.shortcutCover*25 + vertex.delNeighbours*10
         
     def preProcess(self,graph):
+        print("PreProcessing")
         nodeOrdering = np.zeros(shape = len(graph),dtype=np.int64)
         extractNum = 0
         
@@ -87,14 +90,13 @@ class PreProcess:
             vertex = heapq.heappop(self.PQImp)[1]
             self.computeImportance2(graph,vertex)
             
-            if len(self.PQImp)!=0 and vertex.importance > self.PQImp[0][1].importance:
+            if len(self.PQImp)!=0 and (vertex.importance > self.PQImp[0][1].importance):
                 heapq.heappush(self.PQImp,(vertex.importance,vertex))
                 continue
             
             nodeOrdering[extractNum] = vertex.vertexNum
             vertex.orderPos = extractNum
             extractNum += 1
-            
             self.contractNode(graph,vertex,extractNum-1)
             
         return nodeOrdering
@@ -150,7 +152,7 @@ class PreProcess:
                 if graph[outVertex].contracted==True:
                     continue
             
-                if graph[outVertex].distance.contractId!=contractId or graph[outVertex].distance.sourceId!=i or graph[outVertex].distance.distance>(incost+outcost):
+                if ((graph[outVertex].distance.contractId!=contractId) or (graph[outVertex].distance.sourceId!=i) or (graph[outVertex].distance.distance>(incost+outcost))):
                     #print("In : ",revHMap[inVertex] , " , Out : ",revHMap[outVertex] ," , Current : ",revHMap[vertex.vertexNum])
                     inn = inVertex
                     outt = outVertex
@@ -163,21 +165,19 @@ class PreProcess:
                 
                 
     def dijkstra(self,graph,source,maxcost,contractId,sourceId):
-        queue = []
         
         graph[source].distance.distance = 0
         graph[source].distance.contractId = contractId
         graph[source].distance.sourceId = sourceId
         
-        heapq.heappush(queue,(graph[source].distance.distance,graph[source]))
+        heapq.heappush(self.queue,(graph[source].distance.distance,graph[source]))
         #print(queue)
         
-        i = 0
-        while len(queue)!=0:
-            vertex = heapq.heappop(queue)[1]
-            if i>3 or vertex.distance.distance>maxcost :
+        while len(self.queue)!=0:
+            vertex = heapq.heappop(self.queue)[1]
+            if (vertex.distance.distance>maxcost):
                 return
-            self.relaxEdges(graph,vertex.vertexNum,contractId,queue,sourceId)
+            self.relaxEdges(graph,vertex.vertexNum,contractId,self.queue,sourceId)
             
     def relaxEdges(self,graph,vertex,contractId,queue,sourceId):
         vertexList = graph[vertex].outEdges
@@ -190,7 +190,7 @@ class PreProcess:
             if graph[temp].contracted==True:
                 continue
             
-            if self.checkId(graph,vertex,temp)==True or graph[temp].distance.distance > graph[vertex].distance.distance + cost:
+            if self.checkId(graph,vertex,temp)==True or (graph[temp].distance.distance > (graph[vertex].distance.distance + cost)):
                 graph[temp].distance.distance = graph[vertex].distance.distance + cost
                 graph[temp].distance.contractId = contractId
                 graph[temp].distance.sourceId = sourceId
@@ -199,13 +199,13 @@ class PreProcess:
                 #print(queue)
                 #print("-->",graph[temp].vertexNum)
                 el = (graph[temp].distance.distance,graph[temp])
-                if(el in queue):
+                if(el in queue)==True:
                     queue.remove(el)
                     heapq.heapify(queue)
                 heapq.heappush(queue,(graph[temp].distance.distance,graph[temp]))
                 
     def checkId(self,graph,source,target):
-        if graph[source].distance.contractId != graph[target].distance.contractId or graph[source].distance.sourceId != graph[target].distance.sourceId:
+        if (graph[source].distance.contractId != graph[target].distance.contractId) or (graph[source].distance.sourceId != graph[target].distance.sourceId):
             return True
         return False
     
@@ -239,7 +239,7 @@ class BidirectionalDijkstra:
                 vertex1 = heapq.heappop(self.forwQ)[1]
                 if vertex1.distance.queryDist<=estimate :
                     self.relaxEdges(graph,vertex1.vertexNum,"f",nodeOrdering,queryId)
-                if vertex1.processed.revqueryId == queryId and vertex1.processed.revProcessed==True:
+                if (vertex1.processed.revqueryId == queryId) and (vertex1.processed.revProcessed==True):
                     if (vertex1.distance.queryDist + vertex1.distance.revDistance) < estimate:   
                         estimate = vertex1.distance.queryDist + vertex1.distance.revDistance
                         print(vertex1.distance.queryDist)
@@ -249,7 +249,7 @@ class BidirectionalDijkstra:
                 vertex2 = heapq.heappop(self.revQ)[1]
                 if vertex2.distance.revDistance<=estimate :
                     self.relaxEdges(graph,vertex2.vertexNum,"r",nodeOrdering,queryId)
-                if vertex2.processed.forwqueryId == queryId and vertex2.processed.forwProcessed==True:
+                if (vertex2.processed.forwqueryId == queryId) and (vertex2.processed.forwProcessed==True):
                     if (vertex2.distance.revDistance + vertex2.distance.queryDist) < estimate:
                         estimate = vertex2.distance.queryDist + vertex2.distance.revDistance
                      
@@ -290,6 +290,7 @@ class BidirectionalDijkstra:
            for i in range(len(vertexList)):
                temp = vertexList[i]
                #print("Vertex : ",vertex ," Temp : ",temp)
+               #f2.write("Vertex: "+str(vertex)+" Temp: "+str(temp)+"\n")
                cost = costList[i]
                
                if graph[vertex].orderPos < graph[temp].orderPos:
@@ -301,7 +302,7 @@ class BidirectionalDijkstra:
                       #print("Here")
                       #print("Dist  :  ",graph[temp].distance.queryDist)
                       el = (graph[temp].distance.queryDist,graph[temp])
-                      if (el in self.forwQ):
+                      if (el in self.forwQ)==True:
                           self.forwQ.remove(el)
                           heapq.heapify(self.forwQ)
                       heapq.heappush(self.forwQ,(graph[temp].distance.queryDist,graph[temp]))
@@ -314,6 +315,7 @@ class BidirectionalDijkstra:
            
             for i in range(len(vertexList)):
                temp = vertexList[i]
+               #f2.write("revVertex: "+str(vertex)+" Temp: "+str(temp)+"\n")
                #print("@Vertex : ",vertex ," Temp : ",temp)
                cost = costList[i]
                
@@ -326,59 +328,52 @@ class BidirectionalDijkstra:
                        #print("BackHere")
                        #print("Dist  :  ",graph[temp].distance.revDistance)
                        el = (graph[temp].distance.revDistance,graph[temp])
-                       if (el in self.revQ):
+                       if (el in self.revQ)==True:
                            self.revQ.remove(el)
                            heapq.heapify(self.revQ)
                        heapq.heappush(self.revQ,(graph[temp].distance.revDistance,graph[temp]))
 
 
-    def helper(self,start,end,pat):
-        pat.append(revHMap[end])
-        self.uncompress(start,end,pat)
-        pat.append(revHMap[start])
-        
-        el = (start,end)
-        mid = conEdge[el]
-        self.helper(start,end,pat)
-        
-        return pat
-
     def uncompress(self,start,end,path):
         #print("aaaaaaaaa")
-        el = (start,end)
+        #el = (start,end) ulta hobe -________-
+        el = (end,start)
+        print(revHMap[start],revHMap[end])
         if (el in conEdge)==False:
             return
         #print("yesssss")
-        print(revHMap[start]," - ",revHMap[end])
         mid = conEdge[el]
+        print(revHMap[start],revHMap[end],revHMap[mid])
         self.uncompress(start,mid,path)
-        print("MId :",revHMap[mid])
-        ed_el = (mid,end)
-        #if ed_el in Edge==True:
-            #print("yoooooo")
-            #val += Edge[ed_el]
+        #print("MId :",mid)
         path.append(revHMap[mid])
         self.uncompress(mid,end,path)
 
     def find_route(self,source,target):
         #print(conEdge)
-        val = 0
         path = []
+        #path2 = []
         now = target
         while now!=source:
-            #path.append(revHMap[now])
-            ed_el = (now,self.parent[now])
-            #print(revHMap[now],revHMap[self.parent[now]])
-            self.helper(now,self.parent[now],path)
+            #f.write(str(revHMap[now])+" er parent : "+str(revHMap[self.parent[now]])+"\n")
+            #path2.append(revHMap[now])
+            path.append(revHMap[now])
+            '''
+            el = (self.parent[now],now)
+            if (el in Edge)==True:
+                print(" :) ",revHMap[self.parent[now]],revHMap[now])
+            else:
+            '''
             #self.uncompress(now,self.parent[now],path)
-            #if ed_el in Edge==True:
-                #print("gottttt")
-                #val += Edge[ed_el]
             now = self.parent[now]
+        #path2.append(revHMap[source])
         path.append(revHMap[source])
         path.reverse()
+        #path2.reverse()
         print(path)
-        print(val)
+        #print(path2)
+        print(len(path))
+        #f.close()
         
 
 eps = 1e-6
@@ -431,8 +426,6 @@ if __name__ == '__main__':
     for i in range(n):
         graph.append(Vertex(i))
         
-    
-    
     cnt = 0
     
     for i in range(m):
@@ -449,11 +442,10 @@ if __name__ == '__main__':
             revHMap[cnt] = y
             cnt += 1
             
-            
         x = HMap[x]
         y = HMap[y]
         
-        Edge[(x,y)] = cost        
+        Edge[(x,y)] = cost
         
         graph[x].outEdges.append(y)
         graph[x].outECost.append(cost)
@@ -467,7 +459,6 @@ if __name__ == '__main__':
             graph[x].inEdges.append(y)
             graph[x].inECost.append(cost)
           
-    #print(Edge)
     #print(HMap)
     #print(revHMap)
     # origin , dest

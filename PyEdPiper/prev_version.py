@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Oct 30 14:41:33 2019
+Created on Thu Oct 31 14:46:49 2019
 
+@author: User
+"""
+
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct 30 14:41:33 2019
 @author: Zarif
 """
 import heapq
@@ -9,13 +15,14 @@ import numpy as np
 import networkx as nx
 import osmnx as ox
 
-inf = 1e18
+inf = 1e20
 
 HMap = {}
 revHMap = {}
 conEdge = {}
+conPoint = set([])
 
-Edge = {}
+f = open("asd2.txt","w")
 
 class Distance:
     def __init__(self):
@@ -138,7 +145,7 @@ class PreProcess:
             inVertex = inEdges[i]
             incost = inECost[i]
             
-            if graph[inVertex].contracted==True:
+            if (graph[inVertex].contracted)==True:
                 continue
             
             self.dijkstra(graph,inVertex,maxx,contractId,i)
@@ -150,17 +157,21 @@ class PreProcess:
                 if graph[outVertex].contracted==True:
                     continue
             
-                if graph[outVertex].distance.contractId!=contractId or graph[outVertex].distance.sourceId!=i or graph[outVertex].distance.distance>(incost+outcost):
-                    #print("In : ",revHMap[inVertex] , " , Out : ",revHMap[outVertex] ," , Current : ",revHMap[vertex.vertexNum])
+                if graph[outVertex].distance.contractId!=contractId or graph[outVertex].distance.sourceId!=i or (graph[outVertex].distance.distance>(incost+outcost)):
+                    print("In : ",revHMap[inVertex] , " , Out : ",revHMap[outVertex] ," , Current : ",revHMap[vertex.vertexNum])
+                    stri = "In : "+str(inVertex)+ " , Out : "+str(outVertex)+" , Current : "+str(vertex.vertexNum) +"\n"
+                    f.write(stri)
                     inn = inVertex
                     outt = outVertex
                     midd = vertex.vertexNum
                     conEdge[(inn,outt)] = midd
+                    conPoint.add(midd)
                     graph[inVertex].outEdges.append(outVertex)
                     graph[inVertex].outECost.append(incost+outcost)
                     graph[outVertex].inEdges.append(inVertex)
                     graph[outVertex].inECost.append(incost+outcost)
-                
+        
+               
                 
     def dijkstra(self,graph,source,maxcost,contractId,sourceId):
         queue = []
@@ -332,53 +343,40 @@ class BidirectionalDijkstra:
                        heapq.heappush(self.revQ,(graph[temp].distance.revDistance,graph[temp]))
 
 
-    def helper(self,start,end,pat):
-        pat.append(revHMap[end])
-        self.uncompress(start,end,pat)
-        pat.append(revHMap[start])
-        
-        el = (start,end)
-        mid = conEdge[el]
-        self.helper(start,end,pat)
-        
-        return pat
-
     def uncompress(self,start,end,path):
         #print("aaaaaaaaa")
         el = (start,end)
+        print(revHMap[start],revHMap[end])
         if (el in conEdge)==False:
+            if (start in conPoint)==False:
+                path.append(revHMap[start])
+            print("Painai :",revHMap[start],revHMap[end])
             return
+        print("-------> ",revHMap[start],revHMap[end])
         #print("yesssss")
-        print(revHMap[start]," - ",revHMap[end])
         mid = conEdge[el]
         self.uncompress(start,mid,path)
-        print("MId :",revHMap[mid])
-        ed_el = (mid,end)
-        #if ed_el in Edge==True:
-            #print("yoooooo")
-            #val += Edge[ed_el]
+        #print("MId :",mid)
         path.append(revHMap[mid])
         self.uncompress(mid,end,path)
 
     def find_route(self,source,target):
-        #print(conEdge)
-        val = 0
+        #print("conEdge :" ,conEdge)
         path = []
         now = target
         while now!=source:
             #path.append(revHMap[now])
-            ed_el = (now,self.parent[now])
-            #print(revHMap[now],revHMap[self.parent[now]])
-            self.helper(now,self.parent[now],path)
-            #self.uncompress(now,self.parent[now],path)
-            #if ed_el in Edge==True:
-                #print("gottttt")
-                #val += Edge[ed_el]
+            el = (now,self.parent[now])
+            if (el in conEdge)==False:
+                path.append(revHMap[now])
+                #now = self.parent(now)
+            else:
+                self.uncompress(now,self.parent[now],path)
             now = self.parent[now]
-        path.append(revHMap[source])
+        #path.append(revHMap[source])
         path.reverse()
         print(path)
-        print(val)
+        print(len(path))
         
 
 eps = 1e-6
@@ -449,11 +447,8 @@ if __name__ == '__main__':
             revHMap[cnt] = y
             cnt += 1
             
-            
         x = HMap[x]
         y = HMap[y]
-        
-        Edge[(x,y)] = cost        
         
         graph[x].outEdges.append(y)
         graph[x].outECost.append(cost)
@@ -461,13 +456,11 @@ if __name__ == '__main__':
         graph[y].inECost.append(cost)
         
         if type==1:
-            Edge[(y,x)] = cost
             graph[y].outEdges.append(x)
             graph[y].outECost.append(cost)
             graph[x].inEdges.append(y)
             graph[x].inECost.append(cost)
           
-    #print(Edge)
     #print(HMap)
     #print(revHMap)
     # origin , dest
@@ -478,9 +471,9 @@ if __name__ == '__main__':
         
     bd = BidirectionalDijkstra()
             
-    u = 53075602
-    v = 53035698
-    print(bd.computeDist(graph,HMap[u],HMap[v],i,nodeOrdering))
+    #u = 53075602
+    #v = 53035698
+    #print(bd.computeDist(graph,HMap[u],HMap[v],i,nodeOrdering))
     
     t = np.int64(input())
         
@@ -488,4 +481,3 @@ if __name__ == '__main__':
         u = np.int64(input())
         v = np.int64(input())
         print(bd.computeDist(graph,HMap[u],HMap[v],i,nodeOrdering))
-     

@@ -444,7 +444,7 @@ public class Main{
 
                 for(int i=0;i<vertexList.size();i++){
                     int temp = vertexList.get(i);
-                    //System.out.println("Vertex : "+vertex +" Temp : "+temp);
+                    System.out.println("Vertex : "+vertex +" Temp : "+temp);
                     Double cost = costList.get(i);
                     if(graph[vertex].orderPos < graph[temp].orderPos){
                         if(graph[vertex].distance.forwqueryId != graph[temp].distance.forwqueryId || graph[temp].distance.queryDist > graph[vertex].distance.queryDist + cost){
@@ -465,10 +465,11 @@ public class Main{
                 graph[vertex].processed.revProcessed = true;
                 graph[vertex].processed.revqueryId = queryId;
 
+
                 for(int i=0;i<vertexList.size();i++){
                     int temp = vertexList.get(i);
                     Double cost = costList.get(i);
-
+                    System.out.println("revVertex : "+vertex +" Temp : "+temp);
                     if(graph[vertex].orderPos < graph[temp].orderPos){
                         if(graph[vertex].distance.revqueryId != graph[temp].distance.revqueryId || graph[temp].distance.revDistance > graph[vertex].distance.revDistance + cost){
                             graph[temp].distance.revqueryId = graph[vertex].distance.revqueryId;
