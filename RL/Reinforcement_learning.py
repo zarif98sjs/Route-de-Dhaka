@@ -2,7 +2,7 @@
 """
 Created on Mon Oct 28 02:40:10 2019
 
-@author: USER
+@author: NEX_HEX
 """
 import copy
 import RL.Q_learning as ql

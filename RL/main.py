@@ -2,7 +2,7 @@
 """
 Created on Mon Oct 28 03:35:09 2019
 
-@author: USER
+@author: NEX_HEX
 """
 
 import Reinforcement_learning as rl
