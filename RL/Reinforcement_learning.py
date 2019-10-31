@@ -33,7 +33,7 @@ class RL:
         node = start
         while node != end:  # TODO : find a way to exit code when end doesn't exist
             temp = self.get_node_with_minQ(self.Q[node])
-            if temp in path:
+            if temp in path: # a cycle shouldnt happen in a shortest path
                 print("No path detected")
                 break
             path.append(temp)

@@ -16,7 +16,7 @@ class Q:
         reward = self.R[state_current][state_next]
         q = self.Q[state_current][state_next]
         # TODO: state_next of destination node doesn't exist if unidirectional 
-        # HOW TO SOLVE
+        # HOW TO SOLVE  --> just added a value if non exist done in preprocessing
         q = q + self.alpha * (reward + min(self.Q[state_next].values()) - q)
         self.Q[state_current][state_next] = round(q,6)
 
@@ -43,13 +43,13 @@ class Q:
             iteration += 1;
             
             if len(valid_moves) == 0:
-                break # TODO : check. if no valid moves left just start over
+                break 
             elif len(valid_moves) == 1:
                 state_next = valid_moves[0]
             else:
                 best_action = random.choice(self.key_of_min_value(self.Q[state_current]))
                 # print("best_action : "+str(best_action))
-                if random.random() < self.epsilon: # use (1/(iteration+1)) for decay_e
+                if random.random() < 1/(iteration+1): # use (1/(iteration+1)) for decay_e
                     valid_moves.pop(valid_moves.index(best_action))
                     state_next = random.choice(valid_moves)
                 else:
