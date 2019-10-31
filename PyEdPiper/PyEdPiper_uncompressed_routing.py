@@ -254,16 +254,21 @@ class BidirectionalDijkstra:
         if estimate==inf:
             return -1
         
+        print("Est ----> ",estimate)
+        print(self.parent)
+        
         path = []
         now = target
         while now!=source:
             path.append(revHMap[now])
+            '''
             cur = revHMap[now]
             temp = revHMap[self.parent[now]]
             el = (cur,temp)
             while el in conEdge:
                 path.append(conEdge[el])
                 el = (cur,conEdge[el])
+            '''
             now = self.parent[now]
         path.append(revHMap[source])
         path.reverse()
@@ -289,6 +294,7 @@ class BidirectionalDijkstra:
                       graph[temp].distance.forwqueryId = graph[vertex].distance.forwqueryId
                       graph[temp].distance.queryDist = graph[vertex].distance.queryDist + cost
                       self.parent[temp] = vertex
+                      print(temp,"  -> ",vertex)
                       #print("Here")
                       #print("Dist  :  ",graph[temp].distance.queryDist)
                       el = (graph[temp].distance.queryDist,graph[temp])
@@ -312,6 +318,7 @@ class BidirectionalDijkstra:
                       graph[temp].distance.revqueryId = graph[vertex].distance.revqueryId
                       graph[temp].distance.revDistance = graph[vertex].distance.revDistance + cost
                       self.parent[vertex] = temp
+                      print(vertex,"  -->  ",temp)
                       #print("BackHere")
                       #print("Dist  :  ",graph[temp].distance.revDistance)
                       el = (graph[temp].distance.revDistance,graph[temp])
@@ -319,6 +326,8 @@ class BidirectionalDijkstra:
                           self.revQ.remove(el)
                           heapq.heapify(self.revQ)
                       heapq.heappush(self.revQ,(graph[temp].distance.revDistance,graph[temp]))
+
+eps = 1e-6
 
 def take_input():
     fp = open("input.txt", "r")
@@ -335,11 +344,11 @@ def take_input():
             num = float(x)
             temp.append(num)
         if not flag:
-            n = int(temp[0])
-            m = int(temp[1])
+            n = np.int64(temp[0])
+            m = np.int64(temp[1])
             flag = True
         else:
-            edge_list.append( (temp[0], temp[1], temp[2],temp[3]) )
+            edge_list.append( (np.int64(temp[0]), np.int64(temp[1]), temp[2],int(temp[3])) )
 
     fp.close()
 
@@ -349,18 +358,18 @@ def take_input():
 if __name__ == '__main__':
     
     
-    G = ox.graph_from_place('Piedmont, California, USA', network_type='drive')
-    nodes_proj, edges = ox.graph_to_gdfs(G, edges=True)
+    #G = ox.graph_from_place('Piedmont, California, USA', network_type='drive')
+    #nodes_proj, edges = ox.graph_to_gdfs(G, edges=True)
     #edges = [g.Edge(source[i],dest[i],weights[i]) for i in range(len(source))]
     
-    orig_node = ox.get_nearest_node(G, (37.828903, -122.245846))
-    dest_node = ox.get_nearest_node(G, (37.812303, -122.215006))
-    route = nx.shortest_path(G, orig_node, dest_node, weight='length')
+    #orig_node = ox.get_nearest_node(G, (37.828903, -122.245846))
+    #dest_node = ox.get_nearest_node(G, (37.812303, -122.215006))
+    #route = nx.shortest_path(G, orig_node, dest_node, weight='length')
     
     n, m, lis = take_input()
     print(n)
     print(m)
-    print(lis)
+    #print(lis)
      
     #vertex = Vertex()
     graph = []
@@ -400,7 +409,7 @@ if __name__ == '__main__':
             graph[x].inEdges.append(y)
             graph[x].inECost.append(cost)
           
-    #print(HMap)
+    print(HMap)
     #print(revHMap)
     # origin , dest
     #53075602 53035698

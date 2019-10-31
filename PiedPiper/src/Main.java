@@ -407,6 +407,13 @@ public class Main{
                 return -1.0;
             }
 
+            for(Integer name:parent.keySet())
+            {
+                String key = name.toString();
+                String value = parent.get(name).toString();
+                System.out.println("PaRENT " + key + " --> " + value);
+            }
+
             //won't give the path including all nodes because of the contraction
             ArrayList<Integer>path = new ArrayList<>();
             int now = target;
@@ -437,7 +444,7 @@ public class Main{
 
                 for(int i=0;i<vertexList.size();i++){
                     int temp = vertexList.get(i);
-                    System.out.println("Vertex : "+vertex +" Temp : "+temp);
+                    //System.out.println("Vertex : "+vertex +" Temp : "+temp);
                     Double cost = costList.get(i);
                     if(graph[vertex].orderPos < graph[temp].orderPos){
                         if(graph[vertex].distance.forwqueryId != graph[temp].distance.forwqueryId || graph[temp].distance.queryDist > graph[vertex].distance.queryDist + cost){
@@ -445,7 +452,7 @@ public class Main{
                             graph[temp].distance.queryDist = graph[vertex].distance.queryDist + cost;
                             parent.put(temp,vertex);
                             System.out.println("Here -----> " + temp+"->"+vertex);
-                            System.out.println("Dist : "+graph[temp].distance.queryDist);
+                            //System.out.println("Dist : "+graph[temp].distance.queryDist);
                             forwQ.remove(graph[temp]);
                             forwQ.add(graph[temp]);
                         }
@@ -468,7 +475,7 @@ public class Main{
                             graph[temp].distance.revDistance = graph[vertex].distance.revDistance + cost;
                             parent.put(vertex,temp);
                             System.out.println("BackHere -----> " + vertex + "->"+temp);
-                            System.out.println("Dist : "+graph[temp].distance.revDistance);
+                            //System.out.println("Dist : "+graph[temp].distance.revDistance);
                             revQ.remove(graph[temp]);
                             revQ.add(graph[temp]);
                         }
@@ -507,7 +514,7 @@ public class Main{
             x = in.nextLong()-1;
             y = in.nextLong()-1;
             c = in.nextDouble();
-            //type = in.nextInt();
+            type = in.nextInt();
 
             if(!HMap.containsKey(x))
             {

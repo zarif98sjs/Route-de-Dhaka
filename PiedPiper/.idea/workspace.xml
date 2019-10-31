@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="44a4b131-c1ff-48b3-9133-cb446e9b774b" name="Default Changelist" comment="" />
+    <list default="true" id="44a4b131-c1ff-48b3-9133-cb446e9b774b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,18 +16,20 @@
     <session id="-445418813">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
+          <entry key="project.closed" value="1" />
           <entry key="project.open.time.0" value="1" />
-          <entry key="project.opened" value="1" />
+          <entry key="project.open.time.48" value="1" />
+          <entry key="project.opened" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="1565" />
+          <entry key="java" value="1602" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="1565" />
+          <entry key="JAVA" value="1602" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -40,12 +45,12 @@
     </session>
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="708">
-              <caret line="243" column="118" selection-start-line="243" selection-start-column="35" selection-end-line="243" selection-end-column="118" />
+            <state relative-caret-position="287">
+              <caret line="413" column="47" selection-start-line="413" selection-start-column="47" selection-end-line="413" selection-end-column="47" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -68,8 +73,10 @@
       <find>forwQ</find>
       <find>vertexNum</find>
       <find>paren</find>
-      <find>parent</find>
       <find>PQcomp</find>
+      <find>parent</find>
+      <find>2</find>
+      <find>280</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -147,16 +154,16 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1572340597451</updated>
-      <workItem from="1572340599227" duration="43954000" />
+      <workItem from="1572340599227" duration="43955000" />
+      <workItem from="1572491407380" duration="4390000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="43954000" />
+    <option name="totallyTimeSpent" value="48345000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1920" y="0" width="1920" height="1080" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
       <window_info id="UI Designer" order="1" />
@@ -171,9 +178,9 @@
       <window_info anchor="bottom" id="Database Changes" order="3" show_stripe_button="false" />
       <window_info anchor="bottom" id="Message" order="4" />
       <window_info anchor="bottom" id="Find" order="5" />
-      <window_info anchor="bottom" x="-23" y="62" width="907" height="460" id="Run" order="6" type="FLOATING" weight="0.3315678" />
+      <window_info active="true" anchor="bottom" x="2792" y="285" width="980" height="624" id="Run" order="6" type="FLOATING" visible="true" weight="0.3315678" />
       <window_info anchor="bottom" id="Debug" order="7" weight="0.4" />
-      <window_info anchor="bottom" id="Messages" order="8" weight="0.32935154" />
+      <window_info anchor="bottom" id="Messages" order="8" weight="0.3291262" />
       <window_info anchor="bottom" id="Cvs" order="9" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="10" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="11" />
@@ -229,16 +236,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="91">
           <caret line="2114" selection-start-line="2114" selection-end-line="2114" />
-          <folding>
-            <element signature="e#80205#80206#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="708">
-          <caret line="243" column="118" selection-start-line="243" selection-start-column="35" selection-end-line="243" selection-end-column="118" />
+        <state relative-caret-position="287">
+          <caret line="413" column="47" selection-start-line="413" selection-start-column="47" selection-end-line="413" selection-end-column="47" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
