@@ -1,5 +1,7 @@
 //Program to implement Contraction Hierarchies Algorithm.
 
+import javafx.util.Pair;
+
 import java.sql.SQLOutput;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -9,6 +11,8 @@ import java.util.PriorityQueue;
 import java.util.Comparator;
 
 public class Main{
+
+    static HashMap<Pair<Integer,Integer>, Integer> conEdge;
 
     static class Distance{
         //Ids are made so that we dont have to reinitialize everytime the distance value to infinity.
@@ -152,14 +156,18 @@ public class Main{
         //function that will pre-process the graph.
         private int [] preProcess(Vertex [] graph){
             int [] nodeOrdering = new int[graph.length];	//contains the vertices in the order they are contracted.
-            int extractNum=0; 				//stores the number of vertices that are contracted.
+            int extractNum=0; //stores the number of vertices that are contracted.
 
+
+            System.out.println("DEBUGGING :  ");
             while(PQImp.size()!=0){
                 Vertex vertex = (Vertex)PQImp.poll();
-                computeImportance(graph,vertex);	//recompute importance before contracting the vertex.
 
+                computeImportance(graph,vertex);	//recompute importance before contracting the vertex.
+                //System.out.println(vertex.importance);
                 //if the vertex's recomputed importance is still minimum then contract it.
                 if(PQImp.size()!=0 && vertex.importance > PQImp.peek().importance){
+                    //System.out.println(vertex.vertexNum);
                     PQImp.add(vertex);
                     continue;
                 }
@@ -222,6 +230,7 @@ public class Main{
             }
 
             Double max = inMax+outMax; 				//total max distance.
+            //System.out.println(max);
 
             for(int i=0;i<inEdges.size();i++){
                 int inVertex = inEdges.get(i);
@@ -239,14 +248,31 @@ public class Main{
                     if(graph[outVertex].contracted){
                         continue;
                     }
-                    if(graph[outVertex].distance.contractId!=contractId || graph[outVertex].distance.sourceId!=i || graph[outVertex].distance.distance>incost+outcost){
+                    if(graph[outVertex].distance.contractId!=contractId ||
+                            graph[outVertex].distance.sourceId!=i ||
+                            graph[outVertex].distance.distance>incost+outcost){
 
                         System.out.println("In : "+inVertex + " , Out : "+outVertex +" , Current : "+vertex.vertexNum);
 
+
+                        Pair<Integer,Integer> pair = new Pair<>(inVertex, outVertex);
+                        conEdge.put(pair, vertex.vertexNum);
                         graph[inVertex].outEdges.add(outVertex);
                         graph[inVertex].outECost.add(incost+outcost);
                         graph[outVertex].inEdges.add(inVertex);
                         graph[outVertex].inECost.add(incost+outcost);
+                        System.out.println("Out : ");
+                        for(int k=0; k<graph[inVertex].outEdges.size(); k++)
+                        {
+                            System.out.print(graph[inVertex].outEdges.get(k) + " ");
+                        }
+                        System.out.println("\n");
+                        System.out.println("In : ");
+                        for(int k=0; k<graph[outVertex].inEdges.size(); k++)
+                        {
+                            System.out.print(graph[outVertex].inEdges.get(k) + " ");
+                        }
+                        System.out.println("\n");
                     }
                 }
             }
@@ -306,6 +332,7 @@ public class Main{
 
         //main function of this class.
         public int [] processing(Vertex [] graph){
+            conEdge = new HashMap<>();
             computeImportance(graph);		//find initial importance by traversing all vertices.
             int [] nodeOrdering = preProcess(graph);
             return nodeOrdering;
@@ -352,7 +379,7 @@ public class Main{
         HashMap<Integer,Integer> parent= new HashMap<>();
 
         //main function that will compute distances.
-        public Double computeDist(Vertex [] graph, int source, int target, int queryID , int [] nodeOrdering){
+        public ArrayList<Integer> computeDist(Vertex [] graph, int source, int target, int queryID , int [] nodeOrdering){
             graph[source].distance.queryDist = 0.0;
             graph[source].distance.forwqueryId = queryID;
             graph[source].processed.forwqueryId = queryID;
@@ -403,9 +430,9 @@ public class Main{
                 }
             }
 
-            if(estimate==Double.MAX_VALUE){
-                return -1.0;
-            }
+//            if(estimate==Double.MAX_VALUE){
+//                return -1.0;
+//            }
 
             for(Integer name:parent.keySet())
             {
@@ -415,22 +442,28 @@ public class Main{
             }
 
             //won't give the path including all nodes because of the contraction
-            ArrayList<Integer>path = new ArrayList<>();
-            int now = target;
-            while(now!=source)
-            {
-                //System.out.println("#"+now);
-                path.add(now);
-                now = parent.get(now);
-            }
-            path.add(source);
-            Collections.reverse(path);
-            for(int x:path)
-                System.out.print(x + " -> ");
-            System.out.println();
-            //System.out.println("#"+source);
-            return estimate;
+//            ArrayList<Integer>path = new ArrayList<>();
+//            int now = target;
+//            while(now!=source)
+//            {
+//                //System.out.println("#"+now);
+//                path.add(now);
+//                now = parent.get(now);
+//            }
+//            path.add(source);
+//            Collections.reverse(path);
+//            for(int x:path)
+//                System.out.print(x + " -> ");
+//            System.out.println();
+//            //System.out.println("#"+source);
+//            return estimate;
+
+
+            return find_route(source,target);
+
         }
+
+
 
 
 
@@ -484,6 +517,38 @@ public class Main{
                 }
             }
         }
+
+        public void uncompress(Integer start, Integer end, ArrayList<Integer> path)
+        {
+            Pair<Integer,Integer> pair = new Pair<>(end,start);
+            if(!conEdge.containsKey(pair)){
+                return;
+            }
+
+            Integer mid = conEdge.get(pair);
+            uncompress(start,mid,path);
+            path.add(mid);
+            uncompress(mid,end,path);
+        }
+
+
+        public ArrayList<Integer> find_route(Integer source, Integer target)
+        {
+            ArrayList<Integer> path = new ArrayList<>();
+            Integer now = target;
+            while(!now.equals(source))
+            {
+                path.add(now);
+                uncompress(now, parent.get(now), path);
+                now = parent.get(now);
+            }
+
+            path.add(source);
+            Collections.reverse(path);
+            return path;
+        }
+
+
 
     }
 
@@ -557,6 +622,10 @@ public class Main{
         //preprocessing stage.
         PreProcess process = new PreProcess();
         int [] nodeOrdering = process.processing(graph);
+//        for (int i=0; i<nodeOrdering.length; i++)
+//        {
+//            System.out.println(nodeOrdering[i]);
+//        }
 
         System.out.println("Ready");
 
@@ -572,7 +641,19 @@ public class Main{
             int u, v;
             u = in.nextInt();
             v = in.nextInt();
-            System.out.println(bd.computeDist(graph,u,v,i,nodeOrdering));
+            ArrayList<Integer> path = bd.computeDist(graph,u,v,i,nodeOrdering);
+            for(int j=0; j< path.size(); j++)
+            {
+                for(Long name : HMap.keySet())
+                {
+                    if(HMap.get(name).equals(path.get(j)))
+                    {
+                        System.out.print(name + ", ");
+                    }
+                }
+
+            }
+            System.out.println(path.size());
         }
     }
 }
