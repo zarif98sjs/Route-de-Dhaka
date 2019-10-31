@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 28 01:51:53 2019
-
-@author: SHERLOCK
-"""
-import heapq
-
-# -*- coding: utf-8 -*-
-"""
 Created on Tue Oct 29 13:59:30 2019
 
 @author: USER
 """
-
+import heapq
+import math
+import networkx as nx
+import osmnx as ox
+import requests
+import matplotlib.cm as cm
+import matplotlib.colors as colors
+ox.config(use_cache=True, log_console=True)
 class Edge:
     def __init__(self, source, dest, length, bidirectional=False):
         self.source = source
@@ -23,14 +22,11 @@ class Edge:
 
 class Graph:
 
-    def __init__(self, nodes, edges):
+    def __init__(self, nodes, edges, lat_lng_list, street_name_list):
         """
         constructor takes in nodes as list of integars
         and edges as lists of Edge class objects
         and also creates an empty dictionary
-
-        Position is needed for A* algorithm
-        If not needed can be deleted later.
         """
         self.nodes = nodes
         self.edges = edges
@@ -41,6 +37,8 @@ class Graph:
         self.outDegree = {}
         self.positions = {}
         self.adj_weights = {}
+        self.lat_lng ={}
+        self.street_names = {}
         for i in nodes:
             self.inDegree[i] = 0
             self.outDegree[i] = 0
@@ -48,6 +46,12 @@ class Graph:
 
         for i in edges:
             self.add_edge(i.source, i.dest, i.length, i.bidirectional)
+            
+        for i in lat_lng_list:
+            self.lat_lng[i[0]] = (i[1],i[2])
+        
+        for i in street_name_list:
+            self.street_names[ (i[0], i[1]) ] = i[2]
 
     ########################## ADDED BY APURBA ###########################
     def get_vertices(self):
@@ -136,6 +140,21 @@ class Graph:
         self.get_path(parent, parent[cur], path)
         path.append(cur)
         return path
+    
+    def deg2rad(self,deg):
+        return deg * (math.pi / 180)
+
+
+    def getDistanceFromLatLon(self,lat1, lon1, lat2, lon2):
+        R = 6371
+        dLat = self.deg2rad(lat2 - lat1)
+        dLon = self.deg2rad(lon2 - lon1)
+        a = math.sin(dLat / 2) * math.sin(dLat / 2) + math.cos(self.deg2rad(lat1)) * math.cos(self.deg2rad(lat2)) * math.sin(
+            dLon / 2) * math.sin(dLon / 2)
+    
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        d = R * c
+        return d*1000
 
     def astar(self, start, end):
         """
@@ -145,22 +164,18 @@ class Graph:
         """
 
         # first one is f,second one is g , third one is h, fourth one is node number
-        start_node = (1, 0, 1, start)
-        end_node = (1, 0, 1, end)
+        start_node = (0, 0, 0, start)
+        end_lat_lng = self.lat_lng[end]
         parent = {}
         open_list = []  # this is the heap to maintain least f
         closed_list = {}
-
+        
         g_list = {}
         f_list = {}
         h_list = {}
-        for i in nodes:
-            f_list[i] = float('inf')
-            g_list[i] = float('inf')
-            h_list[i] = float('inf')
         parent[start] = -1
-        f_list[start] = 1
-        h_list[start] = 1
+        f_list[start] = 0
+        h_list[start] = 0
         g_list[start] = 0
         heapq.heappush(open_list, start_node)
 
@@ -185,7 +200,7 @@ class Graph:
                 for i in self.adj[current_node[3]]:  # Adjacent squares
 
                     # Create new node
-                    new_node = (1, 0, 1, i[0])
+                    new_node = (0, 0, 0, i[0])
 
                     # Append
                     children.append(new_node)
@@ -197,11 +212,12 @@ class Graph:
                         continue
 
                     # Create the f, g, and h values
+                    lat_lngg = self.lat_lng[child_node_number]
                     g_value = current_node[1] + self.adj_weights[(current_node_number, child_node_number)]
-                    h_value = 1
+                    h_value = self.getDistanceFromLatLon(lat_lngg[0],lat_lngg[1],end_lat_lng[0],end_lat_lng[1])
                     f_value = g_value + h_value
                     #print(f_value, " ", g_value, " ", child_node_number)
-                    if f_list[child_node_number] > f_value:
+                    if  child_node_number not in f_list or f_list[child_node_number] > f_value:
                         insert_node = (f_value, g_value, h_value, child_node_number)
                         heapq.heappush(open_list, insert_node)
                         parent[child_node_number] = current_node_number
@@ -211,9 +227,49 @@ class Graph:
 
         print("Path not found")
         return None
+    
+    def get_direction(self,start_lat, start_lng, end_lat, end_lng):
+        x1 = end_lat
+        y1 = end_lng
+        x2 = start_lat
+        y2 = start_lng
+    
+        rad = math.atan2((y1 - y2), (x1 - x2))
+        deg = rad * (180/math.pi)
+        coordNames = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West", "North"]
+        idx = round(deg/45.00)
+        if idx<0:
+            idx += 8
+        return coordNames[idx]
+    
+    def print_path_info(self,path):
+        sz = len(path)
+        last = None
+        last_dir = None
+        for i in range(sz):
+            if i==sz-1 :
+                print('You have reached your destination')
+            else:
+                u= path[i]
+                v= path[i+1]
+                name = self.street_names[(u,v)]
+                dir = self.get_direction(self.lat_lng[u][0],self.lat_lng[u][1],self.lat_lng[v][0],self.lat_lng[v][1] )
+                
+                if last is None or last != name: 
+                    print('You are currently in ', name)
+                    last = name
+                    print('Go to ',dir,' direction following street ', name)
+                    last_dir = dir
+                
+                elif last_dir is None or  last_dir !=dir:
+                    print('Now go to ',dir,' direction following street ', name)
+                    last_dir = dir
+                    
+            
+            
     ############################# RL PART ################################
 
-    # helper function
+    # helper function 
     def add_to_dict(self, key, value):
         if key in self.connections.keys():
             if value not in self.connections[key]:
@@ -249,26 +305,39 @@ class Graph:
 
     ############################# RL PART END ################################
 
-
-if __name__ == "__main__":
-    nodes = [1, 2, 3, 4, 5]
-    # positions = [(0, 0), (-5, 0), (-5, 2), (0, 9), (1, 1)]
-    source = [1, 1, 1, 4, 4, 3]
-    dest = [2, 4, 5, 5, 3, 2]
-    weights = [5, 9, 1, 4, 6, 2]
-    ##############################################################################################
-
-    edges = [Edge(source[i], dest[i], weights[i], True) for i in range(len(source))]
-    g = Graph(nodes, edges)
-
-    print(g.get_edges())
-    print(g.positions)
-    dist, parent = g.dijkstra(1)
-    print(dist)
-    print(parent)
-    for i in nodes:
-        print("Path from 1 to ", i, ": ", end=" ")
-        print(g.get_path(parent, i))
-
-    for i in nodes:
-        print(g.astar(1, i))
+if __name__ =="__main__":
+    #print(ox.__version__)
+    G = ox.graph_from_place('Manhattan Island, New York City, New York, USA', network_type='drive')
+    #fig, ax = ox.plot_graph(G)
+    
+    G_proj = ox.project_graph(G)
+    nodes_proj, edges = ox.graph_to_gdfs(G_proj, edges=True)
+    #orig_node = ox.get_nearest_node(G, (37.828903, -122.245846))
+    #dest_node = ox.get_nearest_node(G, (37.812303, -122.215006))
+    orig_node = 1773060097
+    dest_node = 42434559
+    route = nx.shortest_path(G, orig_node, dest_node, weight='length')
+    #fig, ax = ox.plot_graph_route(G, route, node_size=0,fig_width=10,fig_height=10,save= True)
+    
+    
+    nodes = list(G.nodes())
+    EDGES = [Edge(edges.iloc[i]['u'],
+                  edges.iloc[i]['v'], 
+                  edges.iloc[i]['length'],
+                  not edges.iloc[i]['oneway']) for i in range(len(edges))]
+    
+    LAT_LNG = [(nodes_proj.iloc[i]['osmid'] , nodes_proj.iloc[i]['lat'],nodes_proj.iloc[i]['lon']) for i in range(len(nodes_proj))]
+    
+    STREETS = [(edges.iloc[i]['u'], edges.iloc[i]['v'], edges.iloc[i]['name'])for i in range(len(edges))]
+    g = Graph(nodes,EDGES,LAT_LNG,STREETS)
+    dist , parent =  g.dijkstra(orig_node)
+    path = g.get_path(parent,dest_node)
+    path2 = g.astar(orig_node,dest_node)
+    #g.print_path_info(path)
+    print(path== path2)
+    fig, ax = ox.plot_graph_route(G, path, node_size=0)
+    fig, ax = ox.plot_graph_route(G, path2, node_size=0)
+    
+    
+    
+    
