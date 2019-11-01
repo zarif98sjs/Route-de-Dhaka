@@ -69,32 +69,32 @@ with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
 
 ################## SAVING DATA ############################
 
-metro_dict = {} # (start,end):(index, (Sname,Ename), distance)
-for i in range(len(df_metro)):
-    val = [i]
-    distance = 0
-    (lat,lon) = (df_metro.iloc[i][1],df_metro.iloc[i][2])
-    start = (nodes[(lat,lon)])
-    for j in range(3,largest_column_count,2):
-        if type(df_metro.iloc[i][j]) == str:
-            try:
-                f = float(df_metro.iloc[i][j])
-                continue
-            except:
-                (Sname,Ename) = (df_metro.iloc[i][j],df_metro.iloc[i][j+1])
-                #print(Sname + " " +str(j))
-                val.append((Sname,Ename))
-                break
-        
-        (lat2,lon2) = (df_metro.iloc[i][j],df_metro.iloc[i][j+1])
-        distance += getDistanceFromLatLon(lat,lon,lat2,lon2)
-        lat,lon = lat2,lon2
-    end = (nodes[(lat,lon)])
-    val.append(distance)
-    metro_dict[(start,end)] = val
-
-with open('Dictionaries/metro_dict.p', 'wb') as fp:
-    pickle.dump(metro_dict, fp, protocol=pickle.HIGHEST_PROTOCOL)
+#metro_dict = {} # (start,end):(index, (Sname,Ename), distance)
+#for i in range(len(df_metro)):
+#    val = [i]
+#    distance = 0
+#    (lat,lon) = (df_metro.iloc[i][1],df_metro.iloc[i][2])
+#    start = (nodes[(lat,lon)])
+#    for j in range(3,largest_column_count,2):
+#        if type(df_metro.iloc[i][j]) == str:
+#            try:
+#                f = float(df_metro.iloc[i][j])
+#                continue
+#            except:
+#                (Sname,Ename) = (df_metro.iloc[i][j],df_metro.iloc[i][j+1])
+#                #print(Sname + " " +str(j))
+#                val.append((Sname,Ename))
+#                break
+#        
+#        (lat2,lon2) = (df_metro.iloc[i][j],df_metro.iloc[i][j+1])
+#        distance += getDistanceFromLatLon(lat,lon,lat2,lon2)
+#        lat,lon = lat2,lon2
+#    end = (nodes[(lat,lon)])
+#    val.append(distance)
+#    metro_dict[(start,end)] = val
+#
+#with open('Dictionaries/metro_dict.p', 'wb') as fp:
+#    pickle.dump(metro_dict, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 #######################################################################
