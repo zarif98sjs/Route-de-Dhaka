@@ -47,7 +47,7 @@ with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
     middle_nodes_dict = pickle.load(fp)
         
 
-with open('edges_no_weight.txt') as f:
+with open('edges_no_index.txt') as f:
     u = []
     v = []
     weights = []
