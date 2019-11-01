@@ -11,6 +11,8 @@ Created on Fri Nov  1 11:46:26 2019
 
 @author: USER
 """
+import sys, os
+sys.path.append(os.path.abspath(os.path.join('..', 'Graph')))
 import pandas as pd
 import numpy as np
 import Graph as g
@@ -39,15 +41,15 @@ import osmnx as ox
 # print(df)
 
 
-with open('Dictionaries/node_dict.p', 'rb') as fp:
+with open('../Dictionaries/node_dict.p', 'rb') as fp:
     nodes = pickle.load(fp)
-with open('Dictionaries/latlong_dict.p', 'rb') as fp:
+with open('../Dictionaries/latlong_dict.p', 'rb') as fp:
     lat_long = pickle.load(fp)
-with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
+with open('../Dictionaries/middle_nodes_dict.p', 'rb') as fp:
     middle_nodes_dict = pickle.load(fp)
         
 
-with open('edges_no_index.txt') as f:
+with open('../edges_no_index.txt') as f:
     u = []
     v = []
     weights = []

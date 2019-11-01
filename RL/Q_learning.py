@@ -39,10 +39,9 @@ class Q:
         while state_next != end and iteration <100000: # TODO : check whether any problem
             #input("Press to continue")
             valid_moves = list(self.Q[state_current].keys())
-            
             iteration += 1;
-            if iteration == (100000-1):
-                print("path not found in this episode")
+#            if iteration == (100000-1):
+#                print("path not found in this episode")
             
             if len(valid_moves) == 0:
                 break 

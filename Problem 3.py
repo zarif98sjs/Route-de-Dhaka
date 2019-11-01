@@ -38,14 +38,14 @@ with open('Dictionaries/latlong_dict.p', 'rb') as fp:
 with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
     middle_nodes_dict = pickle.load(fp)
 
-#data_file = "Dataset/Roadmap-Dhaka.csv"
-#data_file_u = "Dataset/Routemap-UttaraBus.csv"
-#data_file_b = "Dataset/Routemap-BikolpoBus.csv"
-#data_file_r = "Dataset/Routemap-DhakaMetroRail.csv"
+data_file = "Dataset/Roadmap-Dhaka.csv"
+data_file_u = "Dataset/Routemap-UttaraBus.csv"
+data_file_b = "Dataset/Routemap-BikolpoBus.csv"
+data_file_r = "Dataset/Routemap-DhakaMetroRail.csv"
 #
 #
 ## Delimiter
-#data_file_delimiter = ','
+data_file_delimiter = ','
 #
 ##
 ### Loop the data lines
@@ -66,14 +66,14 @@ with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
 ##
 ### Generate column names (will be 0, 1, 2, ..., largest_column_count - 1)
 ##column_names = [i for i in range(0, largest_column_count)]
-#column_names_u = list(range(96))
-#column_names_b = list(range(128))
-#column_names_r = list(range(156))
-#df_uttara = pd.read_csv(data_file_u, header=None, delimiter=data_file_delimiter, names=column_names_u)
-#df_bikolpo = pd.read_csv(data_file_b, header=None, delimiter=data_file_delimiter, names=column_names_b)
-#df_metro = pd.read_csv(data_file_r, header=None, delimiter=data_file_delimiter, names=column_names_r)
-#
-#
+column_names_u = list(range(96))
+column_names_b = list(range(128))
+column_names_r = list(range(156))
+df_uttara = pd.read_csv(data_file_u, header=None, delimiter=data_file_delimiter, names=column_names_u)
+df_bikolpo = pd.read_csv(data_file_b, header=None, delimiter=data_file_delimiter, names=column_names_b)
+df_metro = pd.read_csv(data_file_r, header=None, delimiter=data_file_delimiter, names=column_names_r)
+
+
 #
 #
 #middle_u_dict = {}
@@ -346,7 +346,7 @@ while True:
                                  coords = [co_ords[i],co_ords[i+1]])
         line.style.linestyle.width = 3
         line.style.linestyle.color = simplekml.Color.red
-    kml.save('Problem_2_it_'+str(iteration)+'.kml')
+    kml.save('Problem_3_it_'+str(iteration)+'.kml')
     iteration+=1
 
 

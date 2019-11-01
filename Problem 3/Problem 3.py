@@ -4,6 +4,8 @@ Created on Fri Nov  1 23:09:39 2019
 
 @author: USER
 """
+import sys, os
+sys.path.append(os.path.abspath(os.path.join('..', 'Graph')))
 import pandas as pd
 import numpy as np
 import Graph as g
@@ -31,11 +33,11 @@ def getDistanceFromLatLon(lat1, lon1, lat2, lon2):
 
 
 
-with open('Dictionaries/node_dict.p', 'rb') as fp:
+with open('../Dictionaries/node_dict.p', 'rb') as fp:
     nodes = pickle.load(fp)
-with open('Dictionaries/latlong_dict.p', 'rb') as fp:
+with open('../Dictionaries/latlong_dict.p', 'rb') as fp:
     lat_long = pickle.load(fp)
-with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
+with open('../Dictionaries/middle_nodes_dict.p', 'rb') as fp:
     middle_nodes_dict = pickle.load(fp)
 
 #data_file = "Dataset/Roadmap-Dhaka.csv"
@@ -197,23 +199,23 @@ with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
 
 
 
-with open('Dictionaries/metro_dict.p', 'rb') as fp:
+with open('../Dictionaries/metro_dict.p', 'rb') as fp:
     metro_dict = pickle.load(fp)
-with open('Dictionaries/middle_r_dict.p', 'rb') as fp:
+with open('../Dictionaries/middle_r_dict.p', 'rb') as fp:
     middle_r_dict = pickle.load(fp)
-with open('Dictionaries/bus_u_dict.p', 'rb') as fp:
+with open('../Dictionaries/bus_u_dict.p', 'rb') as fp:
     bus_u_dict = pickle.load(fp)
-with open('Dictionaries/middle_u_dict.p', 'rb') as fp:
+with open('../Dictionaries/middle_u_dict.p', 'rb') as fp:
     middle_u_dict = pickle.load(fp)
-with open('Dictionaries/bus_b_dict.p', 'rb') as fp:
+with open('../Dictionaries/bus_b_dict.p', 'rb') as fp:
     bus_b_dict = pickle.load(fp)
-with open('Dictionaries/middle_b_dict.p', 'rb') as fp:
+with open('../Dictionaries/middle_b_dict.p', 'rb') as fp:
     middle_b_dict = pickle.load(fp)
-with open('Dictionaries/distance_dict.p', 'rb') as fp:
+with open('../Dictionaries/distance_dict.p', 'rb') as fp:
     distance_dict = pickle.load(fp)
                                               
 
-with open('edges_no_index.txt') as f:
+with open('../edges_no_index.txt') as f:
     u = []
     v = []
     weights = []
@@ -343,10 +345,11 @@ while True:
     kml = simplekml.Kml()
     for i in range(len(co_ords)-1): 
         line = kml.newlinestring(name=str(co_ords[i]) + " "+ str(co_ords[i+1]),
-                                 coords = [co_ords[i],co_ords[i+1]])
+                                 coords = [co_ords[i],co_ords[i+1]],
+                                 description = path_txt[i+3])
         line.style.linestyle.width = 3
         line.style.linestyle.color = simplekml.Color.red
-    kml.save('Problem_2_it_'+str(iteration)+'.kml')
+    kml.save('Problem_3_it_'+str(iteration)+'.kml')
     iteration+=1
 
 

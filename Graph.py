@@ -329,9 +329,9 @@ class Graph:
 
     def get_connections_weights_as_dictionary(self):
         for edge in self.edges:
-            self.add_to_weights_dict(edge.source, edge.dest, edge.length)
+            self.add_to_weights_dict(edge.source, edge.dest, edge.length*1000)
             if edge.bidirectional:
-                self.add_to_weights_dict(edge.dest, edge.source, edge.length)
+                self.add_to_weights_dict(edge.dest, edge.source, edge.length*1000)
         return self.connected_weights
 
     ############################# RL PART END ################################

@@ -119,8 +119,8 @@ with open('edges_no_index.txt') as f:
 import time
 edges = [g.Edge(u[i], v[i], weights[i], True) for i in range(len(u))]
 graph= g.Graph(nodes.values(), edges, lat_long,[])
-orig_node = 899
-dest_node = 515
+orig_node = 1
+dest_node = 5
 start = time.time()
 dist, parent = graph.dijkstra(orig_node)
 path = graph.get_path(parent,dest_node)
@@ -137,21 +137,21 @@ print("Time taken for astar algorithm is : "+str(end-start))
 
 
     
-#start = time.time()
-#R = graph.get_connections_weights_as_dictionary()
-#orig = orig_node
-#dest = dest_node
-#
-#if end not in R.keys():
-#    R[end] = {start:0}
-#
-#alpha = 0.7 # learning rate
-#epsilon = 0.1 #greedy policy
-#episodes = 1000
-#model = rl.RL(R,100)
-#result = model.result(alpha,epsilon,episodes,orig,dest)
-#end = time.time()
-#print("Time taken for RL algorithm is : "+str(end-start))
+start = time.time()
+R = graph.get_connections_weights_as_dictionary()
+orig = orig_node
+dest = dest_node
+
+if end not in R.keys():
+    R[end] = {start:0}
+
+alpha = 0.7 # learning rate
+epsilon = 0.1 #greedy policy
+episodes = 1000
+model = rl.RL(R,100)
+result = model.result(alpha,epsilon,episodes,orig,dest)
+end = time.time()
+print("Time taken for RL algorithm is : "+str(end-start))
 
 it = 0
 co_ords = []
