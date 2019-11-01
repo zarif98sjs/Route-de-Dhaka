@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 import Graph as g
 import pickle
-import RL.Reinforcement_learning as rl
+#import RL.Reinforcement_learning as rl
 import numpy as np
 import simplekml
 import time
@@ -28,14 +28,14 @@ import osmnx as ox
 
 #################  READ DATA ######################################
 # Input
-data_file = "Dataset/Roadmap-Dhaka.csv"
+#ata_file = "Dataset/Roadmap-Dhaka.csv"
 
 # Delimiter
-data_file_delimiter = ','
-column_names = list(range(22))
+#data_file_delimiter = ','
+#column_names = list(range(22))
 
 # Read csv
-df = pd.read_csv(data_file, header=None, delimiter=data_file_delimiter, names=column_names)
+#df = pd.read_csv(data_file, header=None, delimiter=data_file_delimiter, names=column_names)
 # print(df)
 
 
@@ -47,7 +47,7 @@ with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
     middle_nodes_dict = pickle.load(fp)
         
 
-with open('edges_no_weight.txt') as f:
+with open('edges_no_index.txt') as f:
     u = []
     v = []
     weights = []
@@ -136,28 +136,29 @@ while True:
     
     orig_node = get_nearest(org_x,org_y)
     dest_node =  get_nearest(dest_x,dest_y)
+    #orig_node =1 
+    #dest_node =7
     start = time.time()
     dist, parent = graph.dijkstra(orig_node)
     path = graph.get_path(parent,dest_node)
     end = time.time()
     print("Time taken for Dijkstra algorithm is : "+str(end-start))
-    
+    if len(path) ==1:
+        print("Path not Found")
+        continue    
     
     co_ords = []
-    for i in range(len(path)-1):
-        (lat,long) = lat_long[path[i]]
-        #it += 1
-        #print(str(lat)+","+str(long)+","+"0")
-        co_ords.append((lat,long))
-        if (path[i],path[i+1]) in middle_nodes_dict:
-            for j in range(len(middle_nodes_dict[(path[i],path[i+1])])):
-                (lat,long) = lat_long[middle_nodes_dict[path[i],path[i+1]][j]]
-                #print(str(lat)+","+str(long)+","+"0")
-                co_ords.append((lat,long))
-               
-    (lat,long) = lat_long[path[i+1]] 
-    #print(str(lat)+","+str(long)+","+"0")
-    co_ords.append((lat,long))
+    for i in range(len(path)):
+        if i!= (len(path)-1):
+            (lat,long) = lat_long[path[i]]
+            co_ords.append((lat,long))
+            if (path[i],path[i+1]) in middle_nodes_dict:
+                for j in range(len(middle_nodes_dict[(path[i],path[i+1])])):
+                    (lat,long) = lat_long[middle_nodes_dict[path[i],path[i+1]][j]]
+                    co_ords.append((lat,long))
+        else:
+            (lat,long) = lat_long[path[i]]
+            co_ords.append((lat,long))
     
     
     

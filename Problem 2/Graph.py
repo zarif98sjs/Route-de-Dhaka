@@ -155,7 +155,7 @@ class Graph:
     
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         d = R * c
-        return d*1000
+        return d
 
     def astar(self, start, end):
         """
@@ -273,7 +273,7 @@ class Graph:
         sz = len(path)
         str =[]
         str.append("Source:  ("+str(self.lat_lng[path[0]][0])+ ", "+str(self.lat_lng[path[0]][1])+")")
-        str.append("Source:  ("+str(self.lat_lng[path[sz-1]][0])+ ", "+str(self.lat_lng[path[sz-1]][1])+")")
+        str.append("Destination:  ("+str(self.lat_lng[path[sz-1]][0])+ ", "+str(self.lat_lng[path[sz-1]][1])+")")
         for i in range(sz-1):
             if i==0:
                 str.append("Ride Car from Source ("+str(self.lat_lng[path[i]][0])+", "+str(self.lat_lng[path[i]][1])+") to ("+str(self.lat_lng[path[i+1]][0])+", "+str(self.lat_lng[path[i+1]][1])+")" )
@@ -286,7 +286,7 @@ class Graph:
         sz = len(path)
         text =[]
         text.append("Source:  ("+str(path[0][0])+ ", "+str(path[0][1])+")")
-        text.append("Destination:  ("+str(path[-1][0])+ ", "+str(path[-1][1])+")")
+        text.append("Source:  ("+str(path[-1][0])+ ", "+str(path[-1][1])+")")
         for i in range(sz-1):
             if i==0:
                 text.append("Ride Car from Source ("+str(path[i][0])+", "+str(path[i][1])+") to ("+str(path[i+1][0])+", "+str(path[i+1][1])+")" )
@@ -298,7 +298,20 @@ class Graph:
         return text
 
 
-            
+    def print_path_info_latlong(self,path):
+        sz = len(path)
+        text =[]
+        text.append("Source:  ("+str(path[0][0])+ ", "+str(path[0][1])+")")
+        text.append("Source:  ("+str(path[-1][0])+ ", "+str(path[-1][1])+")")
+        for i in range(sz-1):
+            if i==0:
+                text.append("Ride Car from Source ("+str(path[i][0])+", "+str(path[i][1])+") to ("+str(path[i+1][0])+", "+str(path[i+1][1])+")" )
+            elif i== sz-2:
+                text.append("Ride Car from  ("+str(path[i][0])+", "+str(path[i][1])+") to Destination ("+str(path[i+1][0])+", "+str(path[i+1][1])+")" )
+            else:
+                text.append("Ride Car from  ("+str(path[i][0])+", "+str(path[i][1])+") to ("+str(path[i+1][0])+", "+str(path[i+1][1])+")" )
+             
+        return text
     ############################# RL PART ################################
 
     # helper function 
