@@ -9,6 +9,8 @@ import numpy as np
 import Graph as g
 import pickle
 import RL.Reinforcement_learning as rl
+import numpy as np
+import simplekml
 
 # Input
 data_file = "Dataset/Roadmap-Dhaka.csv"
@@ -48,6 +50,7 @@ df = pd.read_csv(data_file, header=None, delimiter=data_file_delimiter, names=co
 #nodes = {}
 #lat_long = {}
 #count = 0
+#middle_nodes_dict = {}
 #
 #
 #
@@ -58,8 +61,9 @@ df = pd.read_csv(data_file, header=None, delimiter=data_file_delimiter, names=co
 #        for j in range(21,0,-1):
 #            if not np.isnan(df.iloc[i][j]):
 #                break
-#        weight = df.iloc[i][j]
+#        weight = np.around(df.iloc[i][j],6)
 #        j = j-2
+#        middle_nodes = []
 #        for k in range(1,j,2):
 #            #print(df.iloc[i][k], df.iloc[i][k+1])
 #            (lat,long) = (df.iloc[i][k], df.iloc[i][k+1])
@@ -69,27 +73,36 @@ df = pd.read_csv(data_file, header=None, delimiter=data_file_delimiter, names=co
 #                count += 1
 #            if k==1:
 #                first_node = (lat,long)
-#            if k==(j-1):
+#            elif k==(j-1):
 #                last_node = (lat,long)
+#            else:
+#                middle_nodes.append(nodes[(lat,long)])
+#        middle_nodes_dict[(nodes[first_node], nodes[last_node])] = middle_nodes
+#        
 #        f.write(str(nodes[first_node]) + " " + str(nodes[last_node]) + " "
-#                 + str(weight) + "\n")
+#                 + str(np.around(weight,6)) + "\n")
 #        
 #    
 #            
 #
-#with open('node_dict.p', 'wb') as fp:
+#with open('Dictionaries/node_dict.p', 'wb') as fp:
 #    pickle.dump(nodes, fp, protocol=pickle.HIGHEST_PROTOCOL)
-#with open('latlong_dict.p', 'wb') as fp:
+#with open('Dictionaries/latlong_dict.p', 'wb') as fp:
 #    pickle.dump(lat_long, fp, protocol=pickle.HIGHEST_PROTOCOL)
+#with open('Dictionaries/middle_nodes_dict.p', 'wb') as fp:
+#    pickle.dump(middle_nodes_dict, fp, protocol=pickle.HIGHEST_PROTOCOL)
+#    
 
 
-with open('node_dict.p', 'rb') as fp:
+with open('Dictionaries/node_dict.p', 'rb') as fp:
     nodes = pickle.load(fp)
-with open('latlong_dict.p', 'rb') as fp:
+with open('Dictionaries/latlong_dict.p', 'rb') as fp:
     lat_long = pickle.load(fp)
+with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
+    middle_nodes_dict = pickle.load(fp)
         
 
-with open('edges_no_weight.txt') as f:
+with open('edges_no_index.txt') as f:
     u = []
     v = []
     weights = []
@@ -106,8 +119,8 @@ with open('edges_no_weight.txt') as f:
 import time
 edges = [g.Edge(u[i], v[i], weights[i], True) for i in range(len(u))]
 graph= g.Graph(nodes.values(), edges, lat_long,[])
-orig_node = 1
-dest_node = 5
+orig_node = 899
+dest_node = 515
 start = time.time()
 dist, parent = graph.dijkstra(orig_node)
 path = graph.get_path(parent,dest_node)
@@ -124,32 +137,59 @@ print("Time taken for astar algorithm is : "+str(end-start))
 
 
     
-start = time.time()
-R = graph.get_connections_weights_as_dictionary()
-orig = orig_node
-dest = dest_node
+#start = time.time()
+#R = graph.get_connections_weights_as_dictionary()
+#orig = orig_node
+#dest = dest_node
+#
+#if end not in R.keys():
+#    R[end] = {start:0}
+#
+#alpha = 0.7 # learning rate
+#epsilon = 0.1 #greedy policy
+#episodes = 1000
+#model = rl.RL(R,100)
+#result = model.result(alpha,epsilon,episodes,orig,dest)
+#end = time.time()
+#print("Time taken for RL algorithm is : "+str(end-start))
 
-if end not in R.keys():
-    R[end] = {start:0}
-
-alpha = 0.7 # learning rate
-epsilon = 0.1 #greedy policy
-episodes = 1000
-model = rl.RL(R,0)
-result = model.result(alpha,epsilon,episodes,orig,dest)
-end = time.time()
-print("Time taken for RL algorithm is : "+str(end-start))
-
-    
-for i in path:
-    (lat,long) = lat_long[i]
+it = 0
+co_ords = []
+for i in range(len(path)-1):
+    (lat,long) = lat_long[path[i]]
+    it += 1
     print(str(lat)+","+str(long)+","+"0")
+    co_ords.append((lat,long))
+    if (path[i],path[i+1]) in middle_nodes_dict:
+        for j in range(len(middle_nodes_dict[(path[i],path[i+1])])):
+            (lat,long) = lat_long[middle_nodes_dict[path[i],path[i+1]][j]]
+
+            print(str(lat)+","+str(long)+","+"0")
+            co_ords.append((lat,long))
+            it += 1
+(lat,long) = lat_long[path[i+1]] 
+print(str(lat)+","+str(long)+","+"0")
+co_ords.append((lat,long))
+it += 1
 
 
-for i in path2:
-    (lat,long) = lat_long[i]
-    print(str(lat)+","+str(long)+","+"0")
+path_txt = graph.print_path_info_latlong(co_ords)
 
+
+kml = simplekml.Kml()
+for i in range(len(co_ords)-1): 
+    line = kml.newlinestring(name=str(co_ords[i]) + " "+ str(co_ords[i+1]),
+                             coords = [co_ords[i],co_ords[i+1]],
+                             description = path_txt[i+2])
+    line.style.linestyle.width = 3
+    line.style.linestyle.color = simplekml.Color.red
+kml.save('1st.kml')
+
+
+
+#for i in path2:
+#    (lat,long) = lat_long[i]
+#    print(str(lat)+","+str(long)+","+"0")
 
 
 
