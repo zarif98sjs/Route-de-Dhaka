@@ -111,6 +111,7 @@ dest_node = 5
 start = time.time()
 dist, parent = graph.dijkstra(orig_node)
 path = graph.get_path(parent,dest_node)
+#graph.print_path_info2(path)
 end = time.time()
 print("Time taken for Dijkstra algorithm is : "+str(end-start))
 
@@ -123,7 +124,7 @@ end = time.time()
 print("Time taken for astar algorithm is : "+str(end-start))
 
 
-    
+'''
 start = time.time()
 R = graph.get_connections_weights_as_dictionary()
 orig = orig_node
@@ -150,7 +151,7 @@ for i in path2:
     (lat,long) = lat_long[i]
     print(str(lat)+","+str(long)+","+"0")
 
-
+'''
 
 
 
