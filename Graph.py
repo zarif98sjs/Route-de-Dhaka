@@ -47,9 +47,10 @@ class Graph:
         for i in edges:
             self.add_edge(i.source, i.dest, i.length, i.bidirectional)
             
-        for i in lat_lng_list:
-            self.lat_lng[i[0]] = (i[1],i[2])
+#        for i in lat_lng_list:
+#            self.lat_lng[i[0]] = (i[1],i[2])
         
+        self.lat_lng = lat_lng_list
         for i in street_name_list:
             self.street_names[ (i[0], i[1]) ] = i[2]
 
@@ -188,6 +189,8 @@ class Graph:
             # found the node
             if current_node_number == end:
                 print("Path found")
+                
+                print(g_list[end])
                 path = []
                 current = current_node[3]
                 while current != -1:
