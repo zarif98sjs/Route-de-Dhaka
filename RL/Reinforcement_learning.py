@@ -5,7 +5,7 @@ Created on Mon Oct 28 02:40:10 2019
 @author: NEX_HEX
 """
 import copy
-import RL.Q_learning as ql
+import Q_learning as ql
 
 
 ##### Here the input Graph has to be bidirectional otherwise wont work ############

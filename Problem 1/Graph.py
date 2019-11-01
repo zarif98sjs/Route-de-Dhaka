@@ -91,7 +91,7 @@ class Graph:
             self.inDegree[u] += 1
             self.outDegree[v] += 1
 
-    def dijkstra(self, source,target):
+    def dijkstra(self, source):
         """
         :param source: takes the source from where dijkstra to be run
         :return: the dictionary of distance from source to all other nodes
@@ -118,13 +118,11 @@ class Graph:
             for j in self.adj[a]:
                 b = j[0]
                 w = j[1]
-                print(b)
                 if dist[a] + w < dist[b]:  ### this is the main comparison
                     parent[b] = a  # To track the path
                     dist[b] = dist[a] + w
                     heapq.heappush(priority_queue, (dist[b], b))
 
-        print("Dij : ",dist[target])
         return dist, parent
 
     def get_path(self, parent, cur, path=None):
@@ -168,7 +166,7 @@ class Graph:
 
         # first one is f,second one is g , third one is h, fourth one is node number
         start_node = (0, 0, 0, start)
-        end_lat_lng = self.lat_lng[end]
+        #end_lat_lng = self.lat_lng[end]
         parent = {}
         open_list = []  # this is the heap to maintain least f
         closed_list = {}
@@ -219,7 +217,8 @@ class Graph:
                     # Create the f, g, and h values
                     lat_lngg = self.lat_lng[child_node_number]
                     g_value = current_node[1] + self.adj_weights[(current_node_number, child_node_number)]
-                    h_value = self.getDistanceFromLatLon(lat_lngg[0],lat_lngg[1],end_lat_lng[0],end_lat_lng[1])
+                    #h_value = self.getDistanceFromLatLon(lat_lngg[0],lat_lngg[1],end_lat_lng[0],end_lat_lng[1])
+                    h_value = 1
                     f_value = g_value + h_value
                     #print(f_value, " ", g_value, " ", child_node_number)
                     if  child_node_number not in f_list or f_list[child_node_number] > f_value:
@@ -270,7 +269,35 @@ class Graph:
                     print('Now go to ',dir,' direction following street ', name)
                     last_dir = dir
                     
-            
+    def print_path_info2(self,path):
+        sz = len(path)
+        str =[]
+        str.append("Source:  ("+str(self.lat_lng[path[0]][0])+ ", "+str(self.lat_lng[path[0]][1])+")")
+        str.append("Source:  ("+str(self.lat_lng[path[sz-1]][0])+ ", "+str(self.lat_lng[path[sz-1]][1])+")")
+        for i in range(sz-1):
+            if i==0:
+                str.append("Ride Car from Source ("+str(self.lat_lng[path[i]][0])+", "+str(self.lat_lng[path[i]][1])+") to ("+str(self.lat_lng[path[i+1]][0])+", "+str(self.lat_lng[path[i+1]][1])+")" )
+            elif i== sz-2:
+                str.append("Ride Car from ("+str(self.lat_lng[path[i]][0])+", "+str(self.lat_lng[path[i]][1])+") to Destination ("+str(self.lat_lng[path[i+1]][0])+", "+str(self.lat_lng[path[i+1]][1])+")" )
+            else:
+                str.append("Ride Car from  ("+str(self.lat_lng[path[i]][0])+", "+str(self.lat_lng[path[i]][1])+") to ("+str(self.lat_lng[path[i+1]][0])+", "+str(self.lat_lng[path[i+1]][1])+")" )
+    
+    def print_path_info_latlong(self,path):
+        sz = len(path)
+        text =[]
+        text.append("Source:  ("+str(path[0][0])+ ", "+str(path[0][1])+")")
+        text.append("Source:  ("+str(path[-1][0])+ ", "+str(path[-1][1])+")")
+        for i in range(sz-1):
+            if i==0:
+                text.append("Ride Car from Source ("+str(path[i][0])+", "+str(path[i][1])+") to ("+str(path[i+1][0])+", "+str(path[i+1][1])+")" )
+            elif i== sz-2:
+                text.append("Ride Car from  ("+str(path[i][0])+", "+str(path[i][1])+") to Destination ("+str(path[i+1][0])+", "+str(path[i+1][1])+")" )
+            else:
+                text.append("Ride Car from  ("+str(path[i][0])+", "+str(path[i][1])+") to ("+str(path[i+1][0])+", "+str(path[i+1][1])+")" )
+             
+        return text
+
+
             
     ############################# RL PART ################################
 
@@ -313,18 +340,19 @@ class Graph:
 if __name__ =="__main__":
     #print(ox.__version__)
     G = ox.graph_from_place('Manhattan Island, New York City, New York, USA', network_type='drive')
-    #fig, ax = ox.plot_graph(G)
-    
+    type(G)
+    fig, ax = ox.plot_graph(G)
+    #G.
     G_proj = ox.project_graph(G)
-    nodes_proj, edges = ox.graph_to_gdfs(G_proj, edges=True)
-    #orig_node = ox.get_nearest_node(G, (37.828903, -122.245846))
-    #dest_node = ox.get_nearest_node(G, (37.812303, -122.215006))
-    orig_node = 1773060097
-    dest_node = 42434559
+    nodes_proj, edges = ox.graph_to_gdfs(G, edges=True)
+    orig_node = ox.get_nearest_node(G, (37.828903, -122.245846))
+    dest_node = ox.get_nearest_node(G, (37.812303, -122.215006))
+    #orig_node = 1773060097
+    #dest_node = 42434559
     route = nx.shortest_path(G, orig_node, dest_node, weight='length')
     #fig, ax = ox.plot_graph_route(G, route, node_size=0,fig_width=10,fig_height=10,save= True)
     
-    
+    '''
     nodes = list(G.nodes())
     EDGES = [Edge(edges.iloc[i]['u'],
                   edges.iloc[i]['v'], 
@@ -335,13 +363,14 @@ if __name__ =="__main__":
     
     STREETS = [(edges.iloc[i]['u'], edges.iloc[i]['v'], edges.iloc[i]['name'])for i in range(len(edges))]
     g = Graph(nodes,EDGES,LAT_LNG,STREETS)
-    dist , parent =  g.dijkstra(orig_node,dest_node)
-    #path = g.get_path(parent,dest_node)
-    #path2 = g.astar(orig_node,dest_node)
+    dist , parent =  g.dijkstra(orig_node)
+    path = g.get_path(parent,dest_node)
+    path2 = g.astar(orig_node,dest_node)
     #g.print_path_info(path)
-    #print(path== path2)
-    #fig, ax = ox.plot_graph_route(G, path, node_size=0)
-    #fig, ax = ox.plot_graph_route(G, path2, node_size=0)
+    print(path== path2)
+    fig, ax = ox.plot_graph_route(G, path, node_size=0)
+    fig, ax = ox.plot_graph_route(G, path2, node_size=0)
+    '''
     
     
     

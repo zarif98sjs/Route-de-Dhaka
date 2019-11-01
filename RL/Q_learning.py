@@ -36,11 +36,13 @@ class Q:
         iteration = 0 #for decay_e
         
         # end was a list in preimplemented version 
-        while state_next != end and iteration <10000: # TODO : check whether any problem
+        while state_next != end and iteration <100000: # TODO : check whether any problem
             #input("Press to continue")
             valid_moves = list(self.Q[state_current].keys())
             
             iteration += 1;
+            if iteration == (100000-1):
+                print("path not found in this episode")
             
             if len(valid_moves) == 0:
                 break 
@@ -49,7 +51,7 @@ class Q:
             else:
                 best_action = random.choice(self.key_of_min_value(self.Q[state_current]))
                 # print("best_action : "+str(best_action))
-                if random.random() < 1/(iteration+1): # use (1/(iteration+1)) for decay_e
+                if random.random() < self.epsilon: # use (1/(iteration+1)) for decay_e
                     valid_moves.pop(valid_moves.index(best_action))
                     state_next = random.choice(valid_moves)
                 else:
