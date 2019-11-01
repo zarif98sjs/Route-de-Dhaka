@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 import Graph as g
 import pickle
-import RL.Reinforcement_learning as rl
+#import RL.Reinforcement_learning as rl
 import numpy as np
 import simplekml
 import time
@@ -24,6 +24,17 @@ import matplotlib.pyplot as plt
 from shapely.geometry import LineString
 import networkx as nx
 import osmnx as ox
+import bi_dir as bd
+
+
+def write_file(filename, path_list):
+    with open(filename,'w+') as f:
+        f.write("Problem no : 1\n")
+        f.write(path_list[0]+'\n')
+        f.write(path_list[1]+'\n')
+        for i in range(2,len(path_list)):
+            f.write(path_list[i]+'\n')
+        
 
 
 #################  READ DATA ######################################
@@ -101,6 +112,7 @@ with open('edges_no_index.txt') as f:
 
 edges = [g.Edge(u[i], v[i], weights[i], True) for i in range(len(u))]
 graph= g.Graph(nodes.values(), edges, lat_long,[])
+bdi = bd.Graph(nodes.values(), edges, lat_long, [])
 '''
 G =  nx.MultiDiGraph()
 for i in range(len(u)):
@@ -138,9 +150,20 @@ while True:
     
     orig_node = get_nearest(org_x,org_y)
     dest_node =  get_nearest(dest_x,dest_y)
+    print(orig_node)
+    print(orig_node)
     start = time.time()
     dist, parent = graph.dijkstra(orig_node)
     path = graph.get_path(parent,dest_node)
+    #print(path)
+    end = time.time()
+    print("Time taken for Dijkstra algorithm is : "+str(end-start))
+    
+    
+    start = time.time()
+    bdi.bi_dijkstra(orig_node, dest_node)
+    
+    #print(path)
     end = time.time()
     print("Time taken for Dijkstra algorithm is : "+str(end-start))
     
@@ -162,8 +185,10 @@ while True:
     co_ords.append((lat,long))
     
     
-    
+    # origin 90.383309 23.738697
+    # dest 90.363845 23.834136
     path_txt = graph.print_path_info_latlong(co_ords)
+    write_file('Problem_1 '+str(iteration) + '.txt',path_txt )
     ###Path text file e dekhale ekhane likhbo########
     
     kml = simplekml.Kml()
@@ -173,7 +198,7 @@ while True:
                                  description = path_txt[i+2])
         line.style.linestyle.width = 3
         line.style.linestyle.color = simplekml.Color.red
-    kml.save('Problem_1_it_'+str(iteration)+'.kml')
+    kml.save('Problem_1 '+str(iteration)+'.kml')
     iteration+=1
 
 
