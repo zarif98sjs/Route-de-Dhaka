@@ -44,7 +44,7 @@ edges = [g.Edge(edges.iloc[i]['u'],
                   edges.iloc[i]['length'],
                   not edges.iloc[i]['oneway']) for i in range(len(edges))]
     
-R = g.Graph(nodes,edges).get_connections_weights_as_dictionary()
+R = g.Graph(nodes,edges,[],[]).get_connections_weights_as_dictionary()
 #route = nx.shortest_path(G, orig_node, dest_node, weight='length')
 start = orig_node
 end = dest_node
