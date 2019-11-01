@@ -442,20 +442,20 @@ public class Main{
             }
 
             //won't give the path including all nodes because of the contraction
-//            ArrayList<Integer>path = new ArrayList<>();
-//            int now = target;
-//            while(now!=source)
-//            {
-//                //System.out.println("#"+now);
-//                path.add(now);
-//                now = parent.get(now);
-//            }
-//            path.add(source);
-//            Collections.reverse(path);
-//            for(int x:path)
-//                System.out.print(x + " -> ");
-//            System.out.println();
-//            //System.out.println("#"+source);
+            ArrayList<Integer>path = new ArrayList<>();
+            int now = target;
+            while(now!=source)
+            {
+              //System.out.println("#"+now);
+               path.add(now);
+                now = parent.get(now);
+            }
+            path.add(source);
+            Collections.reverse(path);
+            for(int x:path)
+               System.out.print(x + " -> ");
+            System.out.println();
+            //System.out.println("#"+source);
 //            return estimate;
 
 
@@ -526,9 +526,9 @@ public class Main{
             }
 
             Integer mid = conEdge.get(pair);
-            uncompress(start,mid,path);
-            path.add(mid);
             uncompress(mid,end,path);
+            path.add(mid);
+            uncompress(start,mid,path);
         }
 
 
@@ -566,21 +566,22 @@ public class Main{
             graph[i] = new Vertex(i);
         }
 
-        HashMap<Long,Integer>HMap = new HashMap<>();
+        HashMap<Integer,Integer>HMap = new HashMap<>();
 
-        long origin = 53075602 - 1;
-        long target = 53035698 - 1;
+        //long origin = 53075602 - 1;
+        //long target = 53035698 - 1;
 
         //get edges
         int cnt = 0;
         for (int i = 0; i < m; i++) {
-            Long x, y;
+            Integer x, y;
             int type=1;
             Double c;
-            x = in.nextLong()-1;
-            y = in.nextLong()-1;
+            x = in.nextInt();
+            y = in.nextInt();
             c = in.nextDouble();
-            type = in.nextInt();
+            System.out.println("Hoise "+i);
+            //type = in.nextInt();
 
             if(!HMap.containsKey(x))
             {
@@ -610,13 +611,13 @@ public class Main{
             }
         }
 
-        for(Long name:HMap.keySet())
+        for(Integer name:HMap.keySet())
         {
             String key = name.toString();
             String value = HMap.get(name).toString();
-            name = name + 1;
-            String key2 = name.toString();
-            System.out.println(key2 + " --> " + value);
+            //name = name + 1;
+            //String key2 = name.toString();
+            System.out.println(key + " --> " + value);
         }
 
         //preprocessing stage.
@@ -629,8 +630,8 @@ public class Main{
 
         System.out.println("Ready");
 
-        System.out.println(HMap.get(origin));
-        System.out.println(HMap.get(target));
+        //System.out.println(HMap.get(origin));
+        //System.out.println(HMap.get(target));
 
         //acutal distance computation stage.
         BidirectionalDijkstra bd = new BidirectionalDijkstra();
@@ -641,13 +642,14 @@ public class Main{
             int u, v;
             u = in.nextInt();
             v = in.nextInt();
-            ArrayList<Integer> path = bd.computeDist(graph,u,v,i,nodeOrdering);
+            ArrayList<Integer> path = bd.computeDist(graph,HMap.get(u),HMap.get(v),i,nodeOrdering);
             for(int j=0; j< path.size(); j++)
             {
-                for(Long name : HMap.keySet())
+                for(Integer name : HMap.keySet())
                 {
                     if(HMap.get(name).equals(path.get(j)))
                     {
+                        //name+=1;
                         System.out.print(name + ", ");
                     }
                 }

@@ -61,7 +61,7 @@ class Vertex:
         self.orderPos = 0
         
     def __lt__(self,other):
-        return self.orderPos<other.orderPos
+        return self.vertexNum<other.vertexNum
         
 class PreProcess:
     def __init__(self):
@@ -98,7 +98,7 @@ class PreProcess:
             nodeOrdering[extractNum] = vertex.vertexNum
             vertex.orderPos = extractNum
             extractNum += 1
-            self.contractNode(graph,vertex,extractNum-1)
+            #self.contractNode(graph,vertex,extractNum-1)
         print("PreProcessing Done")
         return nodeOrdering
     
@@ -197,7 +197,7 @@ class PreProcess:
                 el = (graph[temp].distance.distance,graph[temp])
                 for xx in self.queue:
                     if xx[1]==graph[temp]:
-                        print("aaaaaaaaaaaaaaaaaa")
+                        #print("aaaaaaaaaaaaaaaaaa")
                         self.queue.remove(xx)
                         heapq.heapify(self.queue)
                 '''        
@@ -394,7 +394,7 @@ class BidirectionalDijkstra:
 eps = 1e-6
 
 def take_input():
-    fp = open("input.txt", "r")
+    fp = open("input_boro.txt", "r")
     edge_list = []
     n = 0
     m = 0
@@ -437,8 +437,10 @@ if __name__ == '__main__':
      
     #vertex = Vertex()
     graph = []
+    temp_nodeOrdering = []
     
     for i in range(n):
+        temp_nodeOrdering.append(i)
         graph.append(Vertex(i))
         
     cnt = 0
@@ -481,6 +483,7 @@ if __name__ == '__main__':
         
     process = PreProcess()
     nodeOrdering = process.processing(graph)
+    print(nodeOrdering)
         
     bd = BidirectionalDijkstra()
             

@@ -91,7 +91,7 @@ class Graph:
             self.inDegree[u] += 1
             self.outDegree[v] += 1
 
-    def dijkstra(self, source):
+    def dijkstra(self, source,target):
         """
         :param source: takes the source from where dijkstra to be run
         :return: the dictionary of distance from source to all other nodes
@@ -118,11 +118,13 @@ class Graph:
             for j in self.adj[a]:
                 b = j[0]
                 w = j[1]
+                print(b)
                 if dist[a] + w < dist[b]:  ### this is the main comparison
                     parent[b] = a  # To track the path
                     dist[b] = dist[a] + w
                     heapq.heappush(priority_queue, (dist[b], b))
 
+        print("Dij : ",dist[target])
         return dist, parent
 
     def get_path(self, parent, cur, path=None):
@@ -333,13 +335,13 @@ if __name__ =="__main__":
     
     STREETS = [(edges.iloc[i]['u'], edges.iloc[i]['v'], edges.iloc[i]['name'])for i in range(len(edges))]
     g = Graph(nodes,EDGES,LAT_LNG,STREETS)
-    dist , parent =  g.dijkstra(orig_node)
-    path = g.get_path(parent,dest_node)
-    path2 = g.astar(orig_node,dest_node)
+    dist , parent =  g.dijkstra(orig_node,dest_node)
+    #path = g.get_path(parent,dest_node)
+    #path2 = g.astar(orig_node,dest_node)
     #g.print_path_info(path)
-    print(path== path2)
-    fig, ax = ox.plot_graph_route(G, path, node_size=0)
-    fig, ax = ox.plot_graph_route(G, path2, node_size=0)
+    #print(path== path2)
+    #fig, ax = ox.plot_graph_route(G, path, node_size=0)
+    #fig, ax = ox.plot_graph_route(G, path2, node_size=0)
     
     
     
