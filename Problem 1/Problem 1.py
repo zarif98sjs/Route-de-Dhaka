@@ -101,7 +101,6 @@ with open('edges_no_weight.txt') as f:
 
 edges = [g.Edge(u[i], v[i], weights[i], True) for i in range(len(u))]
 graph= g.Graph(nodes.values(), edges, lat_long,[])
-'''
 G =  nx.MultiDiGraph()
 for i in range(len(u)):
     temp_list = []
@@ -114,7 +113,6 @@ for i in range(len(u)):
     #print(temp_list)
     ls = LineString(temp_list)
     G.add_edge(u[i],v[i],geometry = ls)
-'''
     
 def get_nearest(lat, long):
     lowest = None
