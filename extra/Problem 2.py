@@ -31,8 +31,8 @@ def getDistanceFromLatLon(lat1, lon1, lat2, lon2):
 
 
 # Input
-data_file = "Dataset/Roadmap-Dhaka.csv"
-data_file = "Dataset/Routemap-DhakaMetroRail.csv"
+data_file = "../Dataset/Roadmap-Dhaka.csv"
+data_file = "../Dataset/Routemap-DhakaMetroRail.csv"
 
 
 # Delimiter
@@ -60,11 +60,11 @@ data_file_delimiter = ','
 column_names = list(range(156))
 df_metro = pd.read_csv(data_file, header=None, delimiter=data_file_delimiter, names=column_names)
 
-with open('Dictionaries/node_dict.p', 'rb') as fp:
+with open('../Dictionaries/node_dict.p', 'rb') as fp:
     nodes = pickle.load(fp)
-with open('Dictionaries/latlong_dict.p', 'rb') as fp:
+with open('../Dictionaries/latlong_dict.p', 'rb') as fp:
     lat_long = pickle.load(fp)
-with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
+with open('../Dictionaries/middle_nodes_dict.p', 'rb') as fp:
     middle_nodes_dict = pickle.load(fp)
 
 
@@ -100,7 +100,7 @@ with open('Dictionaries/middle_nodes_dict.p', 'rb') as fp:
 
 #######################################################################
 
-with open('Dictionaries/metro_dict.p', 'rb') as fp:
+with open('../Dictionaries/metro_dict.p', 'rb') as fp:
     metro_dict = pickle.load(fp)
         
 
@@ -130,10 +130,10 @@ with open('Dictionaries/metro_dict.p', 'rb') as fp:
 
 #######################################################################
 
-with open('Dictionaries/distance_dict.p', 'rb') as fp:
+with open('../Dictionaries/distance_dict.p', 'rb') as fp:
     distance_dict = pickle.load(fp)
     
-with open('edges_no_index.txt') as f:
+with open('../edges_no_index.txt') as f:
     u = []
     v = []
     weights = []

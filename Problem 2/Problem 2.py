@@ -4,8 +4,9 @@ Created on Fri Nov  1 11:46:26 2019
 
 @author: USER
 """
-import sys, os
-sys.path.append(os.path.abspath(os.path.join('..', 'Graph')))
+import sys
+sys.path.append('../')import sys, os
+
 import pandas as pd
 import numpy as np
 import Graph as g
