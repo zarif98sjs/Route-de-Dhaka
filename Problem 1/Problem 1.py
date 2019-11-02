@@ -27,6 +27,7 @@ from shapely.geometry import LineString
 import networkx as nx
 import osmnx as ox
 
+        
 
 #################  READ DATA ######################################
 # Input
@@ -186,6 +187,7 @@ while True:
         
     path_txt = graph.print_path_info_latlong(co_ords, same_o, same_d)
     ###Path text file e dekhale ekhane likhbo########
+    g.write_file('Problem_1_it_'+str(iteration)+'.txt',1,path_txt)
     
     kml = simplekml.Kml()
     for i in range(len(co_ords)-1): 

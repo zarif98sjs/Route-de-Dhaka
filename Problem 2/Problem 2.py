@@ -5,7 +5,7 @@ Created on Fri Nov  1 11:46:26 2019
 @author: USER
 """
 import sys
-sys.path.append('../')import sys, os
+sys.path.append('../')
 
 import pandas as pd
 import numpy as np
@@ -135,6 +135,8 @@ with open('../Dictionaries/metro_dict.p', 'rb') as fp:
 
 with open('../Dictionaries/distance_dict.p', 'rb') as fp:
     distance_dict = pickle.load(fp)
+with open('../Dictionaries/middle_r_dict.p', 'rb') as fp:
+    middle_r_dict = pickle.load(fp)
     
 with open('../edges_no_index.txt') as f:
     u = []
@@ -161,32 +163,43 @@ graph= g.Graph(nodes.values(), edges, lat_long,[])
 def get_nearest(lat, long):
     lowest = None
     dist_low = float('inf')
+    same = False
     for i in nodes.values():
         curr = lat_long[i]
-        curr_dist = getDistanceFromLatLon(lat,long,curr[0],curr[1])
+        curr_dist = graph.getDistanceFromLatLon(lat,long,curr[0],curr[1])
         if curr_dist < dist_low:
             dist_low = curr_dist
             lowest = i
-    return lowest
+            lowest_lat,lowest_long = curr[0],curr[1]
+        if (lowest_lat,lowest_long)==(lat,long):
+            same = True
+            #print('same')
+            break
+    return lowest,same
 
-def print_path_info2(cst,path):
+def print_path_info2(cst,path,same_o,same_d):
         sz = len(path)
         text =[]
         text.append("Minimum cost is "+str(cst)+"৳ ")
         text.append("Source:  ("+str(lat_long[path[0]][0])+ ", "+str(lat_long[path[0]][1])+")")
         text.append("Destination:  ("+str(lat_long[path[sz-1]][0])+ ", "+str(lat_long[path[sz-1]][1])+")")
         for i in range(sz-1):
-            if i==0:
+            if i==0 and not same_o:
+                text.append("Walk from Source ("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
+                
+            elif i==0:
                 if (path[i],path[i+1]) in metro_dict:
                     text.append("Cost: "+str(graph.adj_weights[(path[i],path[i+1])])+"৳ .  Ride Metro from Source "+str( metro_dict[(path[i],path[i+1])][1][0])+"("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to "+str( metro_dict[(path[i],path[i+1])][1][1])+ " ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
                 else:
                     text.append("Cost: "+str(graph.adj_weights[(path[i],path[i+1])])+"৳ . Ride Car from Source ("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
+            elif i== sz-2 and not same_d:
+                text.append("Walk from  ("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to Destination ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
+           
             elif i== sz-2:
                 if (path[i],path[i+1]) in metro_dict:
                     text.append("Cost: "+str(graph.adj_weights[(path[i],path[i+1])])+"৳ . Ride Metro from "+str( metro_dict[(path[i],path[i+1])][1][0])+"("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to Destination "+str( metro_dict[(path[i],path[i+1])][1][1])+ " ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
                 else:
-                    text.append("Cost: "+str(graph.adj_weights[(path[i],path[i+1])])+"৳ . Ride Car from ("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to Destination ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
-                
+                    text.append("Cost: "+str(graph.adj_weights[(path[i],path[i+1])])+"৳ . Ride Car from ("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to Destination ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )    
                 
             else:
                 if (path[i],path[i+1]) in metro_dict:
@@ -205,10 +218,10 @@ while True:
     print("Enter the Destination node : ")
     dest_x,dest_y = map(float, input().split())
     
-    orig_node = get_nearest(org_x,org_y)
-    dest_node =  get_nearest(dest_x,dest_y)
-    orig_node = 1
-    dest_node = 5
+    orig_node, same_o = get_nearest(org_x,org_y)
+    dest_node, same_d =  get_nearest(dest_x,dest_y)
+#    orig_node = 1
+#    dest_node = 5
     start = time.time()
     dist, parent = graph.dijkstra(orig_node)
     path = graph.get_path(parent,dest_node)
@@ -227,15 +240,27 @@ while True:
                 for j in range(len(middle_nodes_dict[(path[i],path[i+1])])):
                     (lat,long) = lat_long[middle_nodes_dict[path[i],path[i+1]][j]]
                     co_ords.append((lat,long))
+            if (path[i],path[i+1]) in middle_r_dict:
+                for j in range(len(middle_r_dict[(path[i],path[i+1])])):
+                    (lat,long) = lat_long[middle_r_dict[path[i],path[i+1]][j]]
+                    co_ords.append((lat,long))
         else:
             (lat,long) = lat_long[path[i]]
             co_ords.append((lat,long))
+            
+    if not same_o and not same_d:
+        co_ords = [(org_x, org_y)] + co_ords + [(dest_x, dest_y)]
+    elif not same_o:
+        co_ords = [(org_x, org_y)] + co_ords
+    elif not same_d:
+        co_ords = co_ords + [(dest_x, dest_y)]
 
     
     
     
-    path_txt = print_path_info2(dist[dest_node],path)
+    path_txt = print_path_info2(dist[dest_node],path,same_o,same_d)
     ###Path text file e dekhale ekhane likhbo########
+    g.write_file('Problem__it_'+str(iteration)+'.txt',2, path_txt)
     
     kml = simplekml.Kml()
     for i in range(len(co_ords)-1): 

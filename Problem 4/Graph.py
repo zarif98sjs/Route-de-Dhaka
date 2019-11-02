@@ -389,6 +389,16 @@ class Graph:
 
     ############################# RL PART END ################################
 
+
+def write_file(filename, i , path_list):
+    with open(filename,'w+',encoding="utf-8") as f:
+        f.write("Problem no : "+str(i)+"\n")
+        f.write(path_list[0]+'\n')
+        f.write(path_list[1]+'\n')
+        for i in range(2,len(path_list)):
+            f.write(path_list[i]+'\n')
+
+
 if __name__ =="__main__":
     #print(ox.__version__)
     G = ox.graph_from_place('Manhattan Island, New York City, New York, USA', network_type='drive')
