@@ -1,5 +1,5 @@
 <h1>Problem Intro</h1>
-Datasets were given which contained detailed routes, metro-routes and bus-routes of dhaka city. The problem was to find most efficient routes
+Datasets were given which contained detailed roads, metro-routes and bus-routes of dhaka city. The problem was to find most efficient routes
 based on different criterias. A total of 6 problems were given. The problem set can be found <a href = "https://github.com/zarif98sjs/BUET_Obliviate_CodeSamurai/blob/master/Code%20Samurai%202019%20-%20Problem%20Set.pdf">
 here</a>.
 <br><br>
