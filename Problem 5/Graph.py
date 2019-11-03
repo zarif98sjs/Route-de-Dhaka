@@ -175,7 +175,7 @@ class Graph:
     def calculate_time(self, parent , cur,extra_add):
         if parent[cur] == - 1:
             return 0
-        d= self.calculate_time(parent, parent[cur],extra_add) + self.adj_weights[(cur,parent[cur])]
+        d= self.calculate_time(parent, parent[cur],extra_add) + self.adj_weights[(parent[cur],cur)]
         if (cur,parent[cur]) in  extra_add:
             d+= extra_add[(cur,parent[cur])]
         return d

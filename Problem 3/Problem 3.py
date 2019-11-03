@@ -219,6 +219,7 @@ with open('../edges_no_index.txt') as f:
     u = []
     v = []
     weights = []
+    bidirectional = []
     
     while True:
         line = f.readline()
@@ -228,23 +229,27 @@ with open('../edges_no_index.txt') as f:
         u.append(int(x[0]))
         v.append(int(x[1]))
         weights.append(20* distance_dict[(int(x[0]) , int(x[1]))] )
+        bidirectional.append(True)
 
 for i in bus_u_dict:
     u.append(i[0])
     v.append(i[1])
     weights.append(7* bus_u_dict[i][2])
+    bidirectional.append(False)
 
 for i in bus_b_dict:
     u.append(i[0])
     v.append(i[1])
     weights.append(7* bus_b_dict[i][2])
+    bidirectional.append(False)
 
 for i in metro_dict:
     u.append(i[0])
     v.append(i[1])
     weights.append(5* metro_dict[i][2])
+    bidirectional.append(False)
         
-edges = [g.Edge(u[i], v[i], weights[i], True) for i in range(len(u))]
+edges = [g.Edge(u[i], v[i], weights[i], bidirectional[i]) for i in range(len(u))]
 graph= g.Graph(nodes.values(), edges, lat_long,[])
 
 def get_nearest(lat, long):

@@ -106,7 +106,10 @@ with open('../Dictionaries/middle_nodes_dict.p', 'rb') as fp:
 with open('../Dictionaries/metro_dict.p', 'rb') as fp:
     metro_dict = pickle.load(fp)
         
-
+#metro_rev = {}
+#for (u,v) in metro_dict:
+#    metro_rev[(v,u)] = metro_dict[(u,v)]
+    
 
 
 ########################## SAVING DISTANCE ############################
@@ -142,6 +145,7 @@ with open('../edges_no_index.txt') as f:
     u = []
     v = []
     weights = []
+    bidirectional = []
     
     while True:
         line = f.readline()
@@ -151,13 +155,15 @@ with open('../edges_no_index.txt') as f:
         u.append(int(x[0]))
         v.append(int(x[1]))
         weights.append(20* distance_dict[(int(x[0]) , int(x[1]))] )
+        bidirectional.append(True)
 
 for i in metro_dict:
     u.append(i[0])
     v.append(i[1])
     weights.append(5* metro_dict[i][2])
+    bidirectional.append(False)
         
-edges = [g.Edge(u[i], v[i], weights[i], True) for i in range(len(u))]
+edges = [g.Edge(u[i], v[i], weights[i], bidirectional[i]) for i in range(len(u))]
 graph= g.Graph(nodes.values(), edges, lat_long,[])
 
 def get_nearest(lat, long):
@@ -188,6 +194,7 @@ def print_path_info2(cst,path,same_o,same_d):
                 text.append("Walk from Source ("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
                 
             elif i==0:
+                #print((path[i],path[i+1]))
                 if (path[i],path[i+1]) in metro_dict:
                     text.append("Cost: "+str(graph.adj_weights[(path[i],path[i+1])])+"৳ .  Ride Metro from Source "+str( metro_dict[(path[i],path[i+1])][1][0])+"("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to "+str( metro_dict[(path[i],path[i+1])][1][1])+ " ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
                 else:
@@ -202,7 +209,9 @@ def print_path_info2(cst,path,same_o,same_d):
                     text.append("Cost: "+str(graph.adj_weights[(path[i],path[i+1])])+"৳ . Ride Car from ("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to Destination ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )    
                 
             else:
+                #print((path[i],path[i+1]))
                 if (path[i],path[i+1]) in metro_dict:
+                    #print("PAISI",(path[i],path[i+1]))
                     text.append("Cost: "+str(graph.adj_weights[(path[i],path[i+1])])+"৳ . Ride Metro from "+str( metro_dict[(path[i],path[i+1])][1][0])+"("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to "+str( metro_dict[(path[i],path[i+1])][1][1])+ " ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
                 else:
                     text.append("Cost: "+str(graph.adj_weights[(path[i],path[i+1])])+"৳ . Ride Car from  ("+str(lat_long[path[i]][0])+", "+str(lat_long[path[i]][1])+") to ("+str(lat_long[path[i+1]][0])+", "+str(lat_long[path[i+1]][1])+")" )
@@ -220,8 +229,6 @@ while True:
     
     orig_node, same_o = get_nearest(org_x,org_y)
     dest_node, same_d =  get_nearest(dest_x,dest_y)
-#    orig_node = 1
-#    dest_node = 5
     start = time.time()
     dist, parent = graph.dijkstra(orig_node)
     path = graph.get_path(parent,dest_node)

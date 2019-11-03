@@ -63,6 +63,7 @@ with open('../edges_no_index.txt') as f:
     u = []
     v = []
     weights = []
+    bi = []
     typ ={}
     while True:
         line = f.readline()
@@ -74,6 +75,7 @@ with open('../edges_no_index.txt') as f:
         weights.append( distance_dict[(u[-1],v[-1])] /10)
         typ[(int(x[0]),int(x[1]))] = 1
         typ[(int(x[1]),int(x[0]))] = 1
+        bi.append(True)
 
 for i in bus_u_dict:
     u.append(i[0])
@@ -81,6 +83,7 @@ for i in bus_u_dict:
     weights.append( bus_u_dict[i][2]/10)
     typ[(i[0],i[1])] = 2
     typ[(i[1],i[0])] = 2
+    bi.append(False)
 
 for i in bus_b_dict:
     u.append(i[0])
@@ -88,6 +91,7 @@ for i in bus_b_dict:
     weights.append( bus_b_dict[i][2]/10)
     typ[(i[0],i[1])] = 2
     typ[(i[1],i[0])] = 2
+    bi.append(False)
 
 for i in metro_dict:
     u.append(i[0])
@@ -95,10 +99,11 @@ for i in metro_dict:
     weights.append( metro_dict[i][2]/10)
     typ[(i[0],i[1])] = 3
     typ[(i[1],i[0])] = 3
+    bi.append(False)
 
 
 
-edges = [g.Edge(u[i], v[i], weights[i], True) for i in range(len(u))]
+edges = [g.Edge(u[i], v[i], weights[i], bi[i]) for i in range(len(u))]
 graph= g.Graph(nodes.values(), edges, lat_long,[],typ)
 
 
@@ -241,7 +246,8 @@ while True:
     hour,minute = map(int,when.split(':'))
     if ampm == "PM":
         hour += 12
-    
+    if hour >=24:
+        hour -=24
     same_o = False
     same_d = False
     orig_node, same_o = get_nearest(org_x,org_y)

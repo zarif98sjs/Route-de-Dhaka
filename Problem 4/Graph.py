@@ -175,7 +175,7 @@ class Graph:
     def calculate_dist(self, parent , cur):
         if parent[cur] == - 1:
             return 0
-        d= self.calculate_dist(parent, parent[cur]) + self.adj_weights[(cur,parent[cur])]
+        d= self.calculate_dist(parent, parent[cur]) + self.adj_weights[(parent[cur],cur)]
         return d
     
     def get_path(self, parent, cur, path=None):

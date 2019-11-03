@@ -46,6 +46,7 @@ class Graph:
 
         for i in edges:
             self.add_edge(i.source, i.dest, i.length, i.bidirectional)
+    
             
 #        for i in lat_lng_list:
 #            self.lat_lng[i[0]] = (i[1],i[2])
